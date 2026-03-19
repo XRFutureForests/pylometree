@@ -163,9 +163,3 @@ for _sp, _pars in CR_SPECIES_PARAMS.items():
         units={"hst": "m", "age": "years"},
         notes="Medium site index; ignores stand-density interaction.",
     ))
-                   "using the extended Chapman-Richards function.  Trees. "
-                   "doi:10.1007/s00468-025-02692-0"),
-        pub_year=2025,
-        units={"hst": "m", "age": "years"},
-        notes="Medium site index; ignores stand-density interaction.",
-    ))

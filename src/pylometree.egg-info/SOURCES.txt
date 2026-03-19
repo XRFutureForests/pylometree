@@ -4,7 +4,6 @@ src/pylometree/__init__.py
 src/pylometree.egg-info/PKG-INFO
 src/pylometree.egg-info/SOURCES.txt
 src/pylometree.egg-info/dependency_links.txt
-src/pylometree.egg-info/entry_points.txt
 src/pylometree.egg-info/requires.txt
 src/pylometree.egg-info/top_level.txt
 src/pylometree/data/__init__.py
@@ -25,11 +24,11 @@ src/pylometree/registry/base.py
 src/pylometree/registry/published.py
 src/pylometree/yield_tables/__init__.py
 src/pylometree/yield_tables/cli.py
-src/pylometree/yield_tables/data.py
 src/pylometree/yield_tables/loaders.py
 src/pylometree/yield_tables/providers.py
 src/pylometree/yield_tables/record.py
 src/pylometree/yield_tables/resolver.py
+src/pylometree/yield_tables/schema.py
 src/pylometree/yield_tables/species.py
 src/pylometree/yield_tables/store.py
 src/pylometree/yield_tables/data/__init__.py

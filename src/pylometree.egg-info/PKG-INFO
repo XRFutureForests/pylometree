@@ -21,19 +21,12 @@ Provides-Extra: ml
 Requires-Dist: scikit-learn>=1.3; extra == "ml"
 Provides-Extra: stats
 Requires-Dist: statsmodels>=0.14; extra == "stats"
-Provides-Extra: yield
-Requires-Dist: openpyxl>=3.1; extra == "yield"
-Requires-Dist: tabula-py>=2.7; extra == "yield"
-Requires-Dist: requests>=2.28; extra == "yield"
 Provides-Extra: dev
 Requires-Dist: pytest>=7.4; extra == "dev"
 Requires-Dist: pytest-cov>=4.1; extra == "dev"
 Provides-Extra: all
 Requires-Dist: scikit-learn>=1.3; extra == "all"
 Requires-Dist: statsmodels>=0.14; extra == "all"
-Requires-Dist: openpyxl>=3.1; extra == "all"
-Requires-Dist: tabula-py>=2.7; extra == "all"
-Requires-Dist: requests>=2.28; extra == "all"
 Requires-Dist: pytest>=7.4; extra == "all"
 Requires-Dist: pytest-cov>=4.1; extra == "all"
 
@@ -56,6 +49,7 @@ A general-purpose Python toolkit for tree allometry — fitting, evaluating, and
 | `pylometree.registry` | Searchable model registry pre-loaded with published equations |
 | `pylometree.data` | `Tree` and `Stand` dataclasses with plot-level aggregation |
 | `pylometree.io` | Load trees from CSV or pandas DataFrame |
+| `pylometree.yield_tables` | Multi-source yield table ingestion, store management, and resolution |
 
 ---
 
@@ -247,6 +241,94 @@ from pylometree.metrics import model_report
 report = model_report(y_obs, y_pred, n_params=3, model_name="Chapman-Richards")
 # {'r2': 0.997, 'rmse': 0.42, 'mae': 0.31, 'bias': -0.02,
 #  'aic': -18.7, 'aicc': -15.2, 'msa': 2.1, 'sspb': -0.4}
+```
+
+---
+
+## Yield Tables
+
+The `pylometree.yield_tables` module ingests, normalizes, and resolves forestry yield tables from multiple sources into a single standardized CSV format.
+
+### Ingestion
+
+Run `pylometree-ingest` to extract yield tables from external sources into a local store:
+
+```bash
+# List available providers and their status
+pylometree-ingest --list-providers
+
+# Ingest all available providers into a store directory
+pylometree-ingest --store-dir ./yield_store
+
+# Ingest specific providers with config
+pylometree-ingest \
+  --providers forest_elements et_nwfva carbon_et_xlsx \
+  --config xlsx_path=/data/C_ET_pub.xlsx \
+  --store-dir ./yield_store
+
+# Clean store before re-ingesting
+pylometree-ingest --clean --store-dir ./yield_store
+```
+
+### Providers
+
+| Provider | Source | Species | Dependencies |
+| --- | --- | --- | --- |
+| `forest_elements` | ForestElementsR (classical German tables) | 14 species | R + ForestElementsR |
+| `et_nwfva` | NW-FVA 2021 (Northwest Germany) | 5 species | R + et.nwfva |
+| `carbon_et_xlsx` | Kohlenstoff-Ertragstafeln (Schober) | 5 species | openpyxl |
+| `forest_yield_uk` | UK Forest Yield (FC Booklet 48) | 16 species | tabula-py + Java |
+| `pryor_cherry` | Wild cherry (FC Bulletin 75) | 1 species | tabula-py + Java |
+| `nova_scotia` | Nova Scotia Report 22 | 8 species | tabula-py + Java |
+| `usda_stocking` | USDA stocking/yield tables | varies | tabula-py + Java |
+| `parametric_models` | JSON growth model files | any | none |
+
+Providers are gracefully disabled when dependencies are missing. Use `--list-providers` to check availability.
+
+### Resolution
+
+At runtime, `resolve_yield_table()` looks up the best available table for a species using only pre-ingested local data (no API calls):
+
+```python
+from pylometree.yield_tables import resolve_yield_table
+
+result = resolve_yield_table(
+    species_common="Norway spruce",
+    species_std="norway_spruce",
+    yield_tables_dir=Path("data/input/yield_tables"),
+    store_dir=Path("data/input/yield_tables/store"),
+    preferred_site_index=32.0,
+    preferred_region="DE",
+)
+
+if result:
+    print(result.ages)     # [20, 25, 30, ...]
+    print(result.heights)  # [7.1, 9.2, 11.5, ...] (meters)
+    print(result.dbhs)     # [0.075, 0.095, 0.115, ...] (meters)
+```
+
+Resolution priority:
+
+1. **Local CSV** in `yield_tables_dir` (by standardized species name)
+2. **Ingested store** (best match by region and site index)
+
+### Store format
+
+Each ingested table is a CSV with columns: `age`, `height`, `dbh`, `species_latin`, `region`, `management`, `site_index`, `source`, `table_id`, and optionally `volume`. A `manifest.csv` index enables per-species lookup and multi-criteria selection.
+
+### Parametric models
+
+The `parametric_models` provider evaluates JSON growth model files (Chapman-Richards, Korf, Lundqvist) on an age grid and outputs standard yield table CSVs. This allows species without published yield tables to be covered via fitted parametric equations:
+
+```json
+{
+    "species_latin": "Acer campestre",
+    "height_model": {"type": "chapman_richards", "A": 20.0, "k": 0.025, "p": 1.2, "y0": 0.5},
+    "dbh_model": {"type": "chapman_richards", "A": 40.0, "k": 0.020, "p": 1.1, "y0": 0.0},
+    "age_range": [10, 150],
+    "age_step": 5,
+    "site_index": 1.0
+}
 ```
 
 ---

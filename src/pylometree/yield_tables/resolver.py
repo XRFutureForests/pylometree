@@ -1,4 +1,9 @@
-"""Yield table resolution with priority chain."""
+"""Yield table resolution with priority chain.
+
+Resolution uses only pre-ingested local data.  Runtime API calls to
+openyieldtables.org have been removed -- use ``pylometree-ingest`` to
+populate the store beforehand.
+"""
 
 import logging
 from pathlib import Path
@@ -6,9 +11,7 @@ from typing import Any, Dict, Optional
 
 from pylometree.yield_tables.schema import YieldTableData
 from pylometree.yield_tables.loaders import (
-    auto_discover_yield_table,
     load_local_yield_table,
-    load_openyieldtables,
     load_store_yield_table,
 )
 
@@ -29,16 +32,17 @@ def resolve_yield_table(
 
     Priority:
         1. Local CSV in yield_tables_dir (by standardized name)
-        2. TOML override (explicit table_id + yield_class)
-        3. Ingested store (provider-generated CSVs)
-        4. openyieldtables auto-discovery (via Yield Search term)
+        2. Ingested store (provider-generated CSVs via pylometree-ingest)
+
+    Unused keyword arguments (``calibration_species``, ``yield_search``)
+    are accepted for backward compatibility but ignored.
 
     Args:
         species_common: Common name (e.g., "Norway spruce").
         species_std: Standardized name (e.g., "norway_spruce").
         yield_tables_dir: Path to local yield table CSVs.
-        calibration_species: Config overrides (table_id, yield_class, site_index).
-        yield_search: Search term for openyieldtables auto-discovery.
+        calibration_species: Accepted for compatibility, ignored.
+        yield_search: Accepted for compatibility, ignored.
         store_dir: Path to the ingested yield table store.
         preferred_site_index: Preferred site index for store selection.
         preferred_region: Preferred region for store selection.
@@ -46,9 +50,6 @@ def resolve_yield_table(
     Returns:
         YieldTableData or None.
     """
-    if calibration_species is None:
-        calibration_species = {}
-
     # 1. Try local CSV
     if yield_tables_dir and yield_tables_dir.exists():
         local = load_local_yield_table(species_std, yield_tables_dir)
@@ -56,18 +57,8 @@ def resolve_yield_table(
             logger.info("  Using local yield table: %s", local.title)
             return local
 
-    # 2. Try config override
-    cfg = calibration_species.get(species_common, {})
-    tid = cfg.get("table_id")
-    yc = cfg.get("yield_class")
-    if tid and yc:
-        result = load_openyieldtables(tid, yc)
-        if result:
-            logger.info("  Using config override: table %d, YC %s", tid, yc)
-            return result
-
-    # 3. Try ingested store
-    si = cfg.get("site_index", preferred_site_index)
+    # 2. Try ingested store
+    si = preferred_site_index
     if store_dir and store_dir.exists():
         store_result = load_store_yield_table(
             species_std, store_dir, si, preferred_region
@@ -76,18 +67,5 @@ def resolve_yield_table(
             logger.info("  Using store yield table: %s", store_result.title)
             return store_result
 
-    # 4. Auto-discover from openyieldtables
-    if yield_search:
-        discovered = auto_discover_yield_table(species_common, yield_search)
-        if discovered:
-            result = load_openyieldtables(
-                discovered["table_id"], discovered["yield_class"]
-            )
-            if result:
-                logger.info(
-                    "  Auto-discovered: %s (table %d, YC %s)",
-                    result.title, discovered["table_id"], discovered["yield_class"],
-                )
-                return result
-
+    logger.info("  No yield table found for %s", species_common)
     return None
