@@ -134,6 +134,7 @@ def load_store_yield_table(
     store_dir: Path,
     preferred_site_index: Optional[float] = None,
     preferred_region: str = "",
+    preferred_h50: Optional[float] = None,
 ) -> Optional[YieldTableData]:
     """Load a yield table from the ingested store.
 
@@ -149,7 +150,9 @@ def load_store_yield_table(
     if not tables:
         return None
 
-    best = select_best_table(tables, preferred_region, preferred_site_index)
+    best = select_best_table(
+        tables, preferred_region, preferred_site_index, preferred_h50
+    )
     if not best:
         return None
 
@@ -166,6 +169,8 @@ def load_store_yield_table(
     df = df.sort_values("age").reset_index(drop=True)
     first = df.iloc[0]
 
+    h50_val = best.get("h50")
+
     return YieldTableData(
         ages=df["age"].tolist(),
         heights=df["height"].tolist(),
@@ -176,4 +181,5 @@ def load_store_yield_table(
         species_latin=str(first.get("species_latin", "")),
         region=str(first.get("region", "")),
         management=str(first.get("management", "")),
+        h50=float(h50_val) if h50_val is not None else None,
     )

@@ -21,7 +21,12 @@ Usage::
 
 from pylometree.yield_tables.schema import YieldTableData
 from pylometree.yield_tables.record import YieldTableRecord
-from pylometree.yield_tables.store import StoreManifest, select_best_table
+from pylometree.yield_tables.store import (
+    REFERENCE_AGE,
+    StoreManifest,
+    compute_h50,
+    select_best_table,
+)
 from pylometree.yield_tables.species import SpeciesMapping, load_species_mapping
 from pylometree.yield_tables.loaders import (
     load_local_yield_table,
@@ -36,9 +41,11 @@ from pylometree.yield_tables.providers import (
 )
 
 __all__ = [
+    "REFERENCE_AGE",
     "YieldTableData",
     "YieldTableRecord",
     "StoreManifest",
+    "compute_h50",
     "select_best_table",
     "SpeciesMapping",
     "load_species_mapping",

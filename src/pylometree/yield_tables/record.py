@@ -87,6 +87,8 @@ class YieldTableRecord:
     def validate(self) -> List[str]:
         """Basic quality checks. Returns list of issues (empty = OK)."""
         issues: List[str] = []
+        if not self.standardized_name:
+            issues.append("empty standardized_name (species not in mapping)")
         if len(self.ages) < 2:
             issues.append("fewer than 2 age entries")
         if len(self.ages) != len(self.heights):

@@ -27,6 +27,7 @@ def resolve_yield_table(
     store_dir: Optional[Path] = None,
     preferred_site_index: Optional[float] = None,
     preferred_region: str = "",
+    preferred_h50: Optional[float] = None,
 ) -> Optional[YieldTableData]:
     """Resolve the best yield table for a species.
 
@@ -46,6 +47,9 @@ def resolve_yield_table(
         store_dir: Path to the ingested yield table store.
         preferred_site_index: Preferred site index for store selection.
         preferred_region: Preferred region for store selection.
+        preferred_h50: Preferred h50 (height at age 50) for store selection.
+            When given, selects the table whose h50 is closest to this value.
+            Takes priority over preferred_site_index.
 
     Returns:
         YieldTableData or None.
@@ -58,10 +62,13 @@ def resolve_yield_table(
             return local
 
     # 2. Try ingested store
-    si = preferred_site_index
     if store_dir and store_dir.exists():
         store_result = load_store_yield_table(
-            species_std, store_dir, si, preferred_region
+            species_std,
+            store_dir,
+            preferred_site_index,
+            preferred_region,
+            preferred_h50=preferred_h50,
         )
         if store_result:
             logger.info("  Using store yield table: %s", store_result.title)

@@ -19,3 +19,4 @@ class YieldTableData:
     region: str = ""
     management: str = ""
     site_index: Optional[float] = None
+    h50: Optional[float] = None
