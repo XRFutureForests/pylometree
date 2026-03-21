@@ -1,0 +1,23 @@
+# Research papers
+docs/research/*.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Environments
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Testing / tooling
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
