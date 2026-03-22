@@ -86,4 +86,4 @@ class TestStand:
         stand = Stand.from_dataframe(df, plot_area=0.1)
         assert len(stand) == 2
         assert stand.trees[0].species == "Pinus sp."
-        assert stand.trees[0].species == "Pinus sp."
+        assert stand.trees[1].species == "Quercus sp."

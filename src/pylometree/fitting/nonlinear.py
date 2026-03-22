@@ -58,12 +58,30 @@ class FitResult:
     converged: bool = True
     ci_lower: dict[str, float] = field(default_factory=dict)
     ci_upper: dict[str, float] = field(default_factory=dict)
+    fn: Optional[Callable] = field(default=None, repr=False)
 
-    def predict(self, *args) -> np.ndarray:
-        """Re-run the stored function is not cached; use the fn from catalogue."""
-        raise NotImplementedError(
-            "Use the original model function with self.params to predict."
-        )
+    def predict(self, x: ArrayLike) -> np.ndarray:
+        """Predict with the fitted model.
+
+        Parameters
+        ----------
+        x : array-like or tuple of array-like
+            Covariate(s) in the same format used for fitting.
+
+        Returns
+        -------
+        np.ndarray
+        """
+        if self.fn is None:
+            raise ValueError(
+                "No function stored; pass the original model function "
+                "with self.params to predict."
+            )
+        if isinstance(x, tuple):
+            x_in = tuple(np.asarray(xi, dtype=float) for xi in x)
+            return self.fn(*x_in, *self.params.values())
+        x_in = np.asarray(x, dtype=float)
+        return self.fn(x_in, *self.params.values())
 
     def __repr__(self) -> str:
         r2v = self.metrics.get("r2", float("nan"))
@@ -79,41 +97,90 @@ class FitResult:
 
 
 def fit_model(
-    fn: Callable,
-    x: ArrayLike,
-    y: ArrayLike,
-    param_names: list[str],
+    fn: Callable | ArrayLike | None = None,
+    x: ArrayLike | None = None,
+    y: ArrayLike | None = None,
+    param_names: Optional[list[str]] = None,
     p0: Optional[list[float]] = None,
     bounds: tuple = (-np.inf, np.inf),
     model_name: str = "model",
     max_nfev: int = 5000,
+    *,
+    catalogue: Optional[dict] = None,
 ) -> FitResult:
     """Fit a single allometric model using non-linear least squares.
 
+    Supports two calling conventions:
+
+    **Explicit function** (original)::
+
+        fit_model(fn=my_func, x=dbh, y=height, param_names=["a", "b"])
+
+    **Catalogue lookup** (convenience)::
+
+        fit_model(dbh, height, model_name="chapman_richards")
+
     Parameters
     ----------
-    fn : callable
-        Model function.  Must accept positional covariate array(s) (from *x*)
-        followed by free parameters as positional arguments.
-    x : array-like or tuple of array-like
+    fn : callable or array-like, optional
+        Model function *or* covariate array when using the convenience form.
+        When an array-like is passed, ``x`` is treated as *y* and the model
+        is resolved from *catalogue* via *model_name*.
+    x : array-like, optional
         Covariate(s).  Pass a tuple for multi-covariate functions.
-    y : array-like
+    y : array-like, optional
         Response variable (observed values).
-    param_names : list[str]
-        Names of free parameters in the order ``fn`` accepts them.
+    param_names : list[str], optional
+        Names of free parameters.  Required when *fn* is a callable; inferred
+        from catalogue otherwise.
     p0 : list[float], optional
-        Initial parameter guesses.  If *None*, defaults to all-ones.
+        Initial parameter guesses.  If *None*, defaults to catalogue value or
+        all-ones.
     bounds : tuple
         Lower/upper bounds as ``([lb1, lb2, …], [ub1, ub2, …])``.
     model_name : str
-        Label for the FitResult.
+        Label for the FitResult.  When using catalogue lookup this must match
+        a key in *catalogue*.
     max_nfev : int
         Maximum number of function evaluations.
+    catalogue : dict, optional
+        Model catalogue (e.g. ``HD_MODELS``).  Defaults to ``HD_MODELS``
+        when using the convenience form.
 
     Returns
     -------
     FitResult
     """
+    # --- convenience form: fit_model(x_array, y_array, model_name="...") ---
+    if fn is not None and not callable(fn):
+        if y is not None:
+            raise TypeError(
+                "When the first argument is array-like, pass only "
+                "(x, y, model_name=...).  Do not supply 'y' separately."
+            )
+        x, y = fn, x
+        fn = None
+
+    if fn is None:
+        # Resolve from catalogue
+        if catalogue is None:
+            from pylometree.models.hd import HD_MODELS
+
+            catalogue = HD_MODELS
+        if model_name not in catalogue:
+            raise KeyError(
+                f"Model {model_name!r} not found in catalogue. "
+                f"Available: {list(catalogue.keys())}"
+            )
+        entry = catalogue[model_name]
+        fn = entry["fn"]
+        param_names = entry["params"]
+        if p0 is None:
+            p0 = entry.get("p0")
+        bounds = entry.get("bounds", (-np.inf, np.inf))
+    elif param_names is None:
+        raise TypeError("param_names is required when fn is provided.")
+
     y_arr = np.asarray(y, dtype=float)
     if isinstance(x, tuple):
         x_in = tuple(np.asarray(xi, dtype=float) for xi in x)
@@ -157,6 +224,7 @@ def fit_model(
         covariance=pcov,
         metrics=report,
         converged=converged,
+        fn=fn,
     )
 
 
@@ -166,28 +234,41 @@ def fit_model(
 
 
 def select_model(
-    catalogue: dict[str, dict],
-    x: ArrayLike,
-    y: ArrayLike,
+    catalogue_or_x: dict[str, dict] | ArrayLike | None = None,
+    x: ArrayLike | None = None,
+    y: ArrayLike | None = None,
     criterion: str = "aicc",
     covariate_keys: Optional[list[str]] = None,
+    *,
+    catalogue: Optional[dict] = None,
 ) -> tuple[str, FitResult, list[FitResult]]:
     """Fit all models in a catalogue and select the best by information criterion.
 
+    Supports two calling conventions:
+
+    **Explicit catalogue** (original)::
+
+        best_name, best_res, all_res = select_model(HD_MODELS, x=dbh, y=height)
+
+    **Auto catalogue** (convenience)::
+
+        best_name, best_res, all_res = select_model(dbh, height)
+
     Parameters
     ----------
-    catalogue : dict
-        Model catalogue such as ``HD_MODELS`` or ``BIOMASS_MODELS``.
-        Each entry must have keys ``fn``, ``params``, ``p0``, ``bounds``.
-    x : array-like or tuple
-        Covariate(s) in the same order the model function expects.
-    y : array-like
+    catalogue_or_x : dict or array-like, optional
+        Model catalogue *or* covariate array when using the convenience form.
+    x : array-like, optional
+        Covariate(s) when using the explicit-catalogue form.
+    y : array-like, optional
         Response variable.
     criterion : str
         Comparison criterion: ``"aicc"`` (default), ``"aic"``, ``"bic"``,
         ``"r2"`` (maximised), or ``"rmse"`` (minimised).
     covariate_keys : list[str], optional
         Subset of catalogue keys to evaluate.  Defaults to all.
+    catalogue : dict, optional
+        Explicit catalogue (keyword-only).  Overrides auto-detection.
 
     Returns
     -------
@@ -195,6 +276,24 @@ def select_model(
     best_result : FitResult
     all_results : list[FitResult]
     """
+    # --- Resolve calling convention ---
+    if isinstance(catalogue_or_x, dict):
+        # Old form: select_model(catalogue, x=dbh, y=height)
+        catalogue = catalogue_or_x
+    else:
+        # New form: select_model(dbh, height) — shift args
+        if catalogue_or_x is not None:
+            if y is not None:
+                raise TypeError(
+                    "When the first argument is array-like, pass only "
+                    "(x, y) as positional args."
+                )
+            y = x
+            x = catalogue_or_x
+        if catalogue is None:
+            from pylometree.models.hd import HD_MODELS
+
+            catalogue = HD_MODELS
     keys = covariate_keys or list(catalogue.keys())
     results: list[FitResult] = []
 

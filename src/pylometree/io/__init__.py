@@ -65,6 +65,10 @@ def read_csv(
     return Stand(trees=trees, plot_area=plot_area)
 
 
+# Convenience alias matching README naming convention
+stand_from_csv = read_csv
+
+
 def stand_to_dataframe(stand: Stand):
     """Convert a :class:`~pylometree.data.Stand` to a pandas DataFrame.
 

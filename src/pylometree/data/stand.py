@@ -110,6 +110,52 @@ class Stand:
 
         return self.agb_per_ha * CARBON_FRACTION
 
+    # --- Convenience aliases (match README / common forestry shorthand) ---
+
+    @property
+    def plot_area_ha(self) -> Optional[float]:
+        """Alias for ``plot_area`` (hectares)."""
+        return self.plot_area
+
+    @plot_area_ha.setter
+    def plot_area_ha(self, value: Optional[float]) -> None:
+        self.plot_area = value
+
+    @property
+    def agb_mg_ha(self) -> float:
+        """Alias for ``agb_per_ha`` (Mg ha⁻¹)."""
+        return self.agb_per_ha
+
+    @property
+    def carbon_stock_mg_ha(self) -> float:
+        """Alias for ``carbon_stock_per_ha`` (Mg C ha⁻¹)."""
+        return self.carbon_stock_per_ha
+
+    def summary_df(self):
+        """Per-tree summary as a pandas DataFrame.
+
+        Requires ``pandas`` to be installed.
+        """
+        try:
+            import pandas as pd
+        except ImportError as exc:
+            raise ImportError("pandas is required for summary_df.") from exc
+
+        records = []
+        for t in self.trees:
+            records.append(
+                {
+                    "species": t.species,
+                    "dbh": t.dbh,
+                    "height": t.height,
+                    "basal_area": t.basal_area,
+                    "agb": t.agb,
+                    "crown_area": t.crown_area,
+                    "wood_density": t.wood_density,
+                }
+            )
+        return pd.DataFrame(records)
+
     # ------------------------------------------------------------------
     # Stand Density Index  (Reineke 1933)
     # ------------------------------------------------------------------

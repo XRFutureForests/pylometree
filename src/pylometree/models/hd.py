@@ -66,7 +66,7 @@ def log_linear(dsob: ArrayLike, a: float, b: float) -> np.ndarray:
 def hyperbolic(dsob: ArrayLike, a: float, b: float) -> np.ndarray:
     """Hyperbolic / reciprocal H-D model.
 
-    H = D / (a + b · D)   or equivalently   H = a + b/D
+    H = D / (a + b · D)
 
     Common form used in forest mensuration.
     """

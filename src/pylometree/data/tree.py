@@ -75,6 +75,48 @@ class Tree:
             return None
         return self.dbh**2 * self.height
 
+    @property
+    def carbon_stock(self) -> Optional[float]:
+        """Carbon content (kg C) from stored AGB using IPCC 0.47 fraction."""
+        if self.agb is None:
+            return None
+        from pylometree.data.constants import CARBON_FRACTION
+
+        return self.agb * CARBON_FRACTION
+
+    def estimate_agb(self, model) -> float:
+        """Estimate above-ground biomass using a model or registry entry.
+
+        The result is stored in ``self.agb`` and returned.
+
+        Parameters
+        ----------
+        model : ModelEntry or callable
+            A ``ModelEntry`` (from the registry), or a callable accepting
+            keyword arguments ``dsob``, ``hst``, ``rho``, etc.
+
+        Returns
+        -------
+        float
+            Predicted AGB in kg.
+        """
+        kw: dict = {}
+        if self.dbh is not None:
+            kw["dsob"] = self.dbh
+        if self.height is not None:
+            kw["hst"] = self.height
+        if self.wood_density is not None:
+            kw["rho"] = self.wood_density
+        if self.age is not None:
+            kw["age"] = self.age
+
+        if hasattr(model, "predict"):
+            result = model.predict(**kw)
+        else:
+            result = model(**kw)
+        self.agb = float(result)
+        return self.agb
+
     # ------------------------------------------------------------------
     # Representation
     # ------------------------------------------------------------------

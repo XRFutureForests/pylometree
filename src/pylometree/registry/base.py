@@ -248,6 +248,36 @@ class ModelRegistry:
             types[e.model_type] = types.get(e.model_type, 0) + 1
         return {"total": len(self._entries), "by_type": types}
 
+    def summary_df(self):
+        """Return a pandas DataFrame summarising all registered models.
+
+        Requires ``pandas`` to be installed.
+        """
+        try:
+            import pandas as pd
+        except ImportError as exc:
+            raise ImportError("pandas is required for summary_df.") from exc
+
+        records = []
+        for e in self._entries.values():
+            records.append(
+                {
+                    "model_id": e.model_id,
+                    "model_type": e.model_type,
+                    "response": e.response,
+                    "covariates": e.covariates,
+                    "species": e.species,
+                    "region": e.region,
+                    "pub_year": e.pub_year,
+                    "reference": e.reference,
+                }
+            )
+        return pd.DataFrame(records)
+
+    def __call__(self, model_id: str, **covt_values: float) -> float:
+        """Shortcut: ``registry("id", dsob=30)`` ≡ ``registry.get("id").predict(dsob=30)``."""
+        return self.get(model_id).predict(**covt_values)
+
     def __len__(self) -> int:
         return len(self._entries)
 
