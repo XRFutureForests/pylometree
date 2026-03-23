@@ -399,6 +399,7 @@ def _parse_forest_yield_pdf(
         "Scots pine": "Pinus sylvestris",
         "Corsican pine": "Pinus nigra subsp. laricio",
         "Lodgepole pine": "Pinus contorta",
+        "Grand fir": "Abies grandis",
         "Douglas fir": "Pseudotsuga menziesii",
         "Japanese larch": "Larix kaempferi",
         "European larch": "Larix decidua",
@@ -827,6 +828,241 @@ def _parse_usda_pdf(
 # Internal helpers: Parametric model evaluation
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Internal helpers: Forstpraxis Ertragstafelauszuge PDF parsing
+# ---------------------------------------------------------------------------
+
+# The Forstpraxis Ertragstafelauszuge PDF (AFZ/FHJ Kalender) compiles German
+# yield table extracts for ~20 species in standardized 10-year age intervals.
+# Each species block has columns: age, height, DBH, volume (and sometimes more).
+# Species are identified by German names in section headers.
+
+_FORSTPRAXIS_SPECIES = {
+    "fichte": "Picea abies",
+    "kiefer": "Pinus sylvestris",
+    "buche": "Fagus sylvatica",
+    "eiche": "Quercus robur",
+    "douglasie": "Pseudotsuga menziesii",
+    "lärche": "Larix decidua",
+    "laerche": "Larix decidua",
+    "tanne": "Abies alba",
+    "birke": "Betula pendula",
+    "erle": "Alnus glutinosa",
+    "esche": "Fraxinus excelsior",
+    "hainbuche": "Carpinus betulus",
+    "winterlinde": "Tilia cordata",
+    "linde": "Tilia cordata",
+    "roteiche": "Quercus rubra",
+    "robinie": "Robinia pseudoacacia",
+    "schwarzkiefer": "Pinus nigra",
+    "pappel": "Populus x canescens",
+    "weide": "Salix alba",
+    "edelkastanie": "Castanea sativa",
+}
+
+
+def _parse_forstpraxis_pdf(
+    pdf_path: Path,
+    species_map: SpeciesMapping,
+) -> Iterable[YieldTableRecord]:
+    """Parse German Forstpraxis Ertragstafelauszuge PDF.
+
+    This PDF contains yield table extracts for multiple German species in a
+    standardized format with 10-year age intervals.  Each species section
+    typically has columns for age, height (ho or h100), DBH (dg), and volume.
+    """
+    try:
+        import tabula
+    except ImportError:
+        logger.error("tabula-py not installed")
+        return
+
+    logger.info(
+        "Extracting tables from Forstpraxis Ertragstafelauszuge PDF "
+        "(this may take a minute)..."
+    )
+
+    try:
+        tables = tabula.read_pdf(
+            str(pdf_path), pages="all", multiple_tables=True, lattice=True,
+        )
+    except Exception as e:
+        logger.error("Failed to extract tables from PDF: %s", e)
+        return
+
+    for table_df in tables:
+        if table_df is None or table_df.empty:
+            continue
+
+        table_df.columns = [str(c).strip().lower() for c in table_df.columns]
+
+        # Try to identify which species this table belongs to by scanning
+        # column headers and cell values for German species names
+        species_latin = _identify_forstpraxis_species(table_df)
+        if not species_latin:
+            continue
+
+        # Find standard columns
+        age_col = None
+        for candidate in ["alter", "age", "a"]:
+            if candidate in table_df.columns:
+                age_col = candidate
+                break
+        if age_col is None:
+            continue
+
+        height_col = None
+        for candidate in ["ho", "h100", "h_q_m", "hg", "height", "h",
+                          "oh", "oberhöhe", "oberhoehe"]:
+            if candidate in table_df.columns:
+                height_col = candidate
+                break
+
+        dbh_col = None
+        for candidate in ["dg", "d_q_cm", "dbh", "d", "dg cm"]:
+            if candidate in table_df.columns:
+                dbh_col = candidate
+                break
+
+        vol_col = None
+        for candidate in ["vfm", "v", "volume", "v_m3_ha", "gwl",
+                          "derbholz", "efm"]:
+            if candidate in table_df.columns:
+                vol_col = candidate
+                break
+
+        if height_col is None and dbh_col is None:
+            continue
+
+        # Parse and clean data
+        table_df = table_df.copy()
+        table_df[age_col] = pd.to_numeric(table_df[age_col], errors="coerce")
+        table_df = table_df.dropna(subset=[age_col])
+        if table_df.empty or len(table_df) < 2:
+            continue
+
+        if height_col:
+            table_df[height_col] = pd.to_numeric(
+                table_df[height_col], errors="coerce"
+            )
+        if dbh_col:
+            table_df[dbh_col] = pd.to_numeric(
+                table_df[dbh_col], errors="coerce"
+            )
+        if vol_col:
+            table_df[vol_col] = pd.to_numeric(
+                table_df[vol_col], errors="coerce"
+            )
+
+        # Check for site index / yield class column
+        ek_col = None
+        for candidate in ["ek", "ekl", "ertragsklasse", "yield_class", "si",
+                          "bon", "bonität", "bonitaet"]:
+            if candidate in table_df.columns:
+                ek_col = candidate
+                break
+
+        table_df = table_df.sort_values(age_col).reset_index(drop=True)
+
+        mapped = species_map.get(species_latin)
+        common_name = mapped.get("common_name", "")
+        std_name = mapped.get("standardized_name", "")
+
+        if ek_col:
+            table_df[ek_col] = pd.to_numeric(
+                table_df[ek_col], errors="coerce"
+            )
+            for ek_val, ek_df in table_df.groupby(ek_col):
+                ek_df = ek_df.sort_values(age_col).reset_index(drop=True)
+                if len(ek_df) < 2:
+                    continue
+                si = float(ek_val) if pd.notna(ek_val) else 0.0
+                record = _build_forstpraxis_record(
+                    ek_df, age_col, height_col, dbh_col, vol_col,
+                    species_latin, common_name, std_name, si,
+                )
+                if record:
+                    yield record
+        else:
+            record = _build_forstpraxis_record(
+                table_df, age_col, height_col, dbh_col, vol_col,
+                species_latin, common_name, std_name, 0.0,
+            )
+            if record:
+                yield record
+
+
+def _identify_forstpraxis_species(df: pd.DataFrame) -> Optional[str]:
+    """Try to identify the species from a Forstpraxis table by scanning
+    column names and cell values for German species names."""
+    # Check column names first
+    all_text = " ".join(str(c) for c in df.columns).lower()
+    for name, latin in _FORSTPRAXIS_SPECIES.items():
+        if name in all_text:
+            return latin
+
+    # Check first few rows of each column
+    for col in df.columns:
+        for val in df[col].head(5).astype(str):
+            val_lower = val.lower()
+            for name, latin in _FORSTPRAXIS_SPECIES.items():
+                if name in val_lower:
+                    return latin
+    return None
+
+
+def _build_forstpraxis_record(
+    df: pd.DataFrame,
+    age_col: str,
+    height_col: Optional[str],
+    dbh_col: Optional[str],
+    vol_col: Optional[str],
+    species_latin: str,
+    common_name: str,
+    std_name: str,
+    site_index: float,
+) -> Optional[YieldTableRecord]:
+    """Build a YieldTableRecord from a Forstpraxis table block."""
+    ages = df[age_col].tolist()
+    heights = (
+        [float(h) if pd.notna(h) else 0.0 for h in df[height_col]]
+        if height_col else [0.0] * len(ages)
+    )
+    dbhs = (
+        [float(d) if pd.notna(d) else 0.0 for d in df[dbh_col]]
+        if dbh_col else [0.0] * len(ages)
+    )
+    volumes = (
+        [float(v) if pd.notna(v) else 0.0 for v in df[vol_col]]
+        if vol_col else []
+    )
+
+    si_tag = f"_si{site_index:.0f}" if site_index else ""
+    record = YieldTableRecord(
+        species_latin=species_latin,
+        species_common=common_name,
+        standardized_name=std_name,
+        region="DE",
+        management="normal",
+        site_index=site_index,
+        source="forstpraxis_et",
+        table_id=f"forstpraxis_{std_name}{si_tag}",
+        ages=ages,
+        heights=heights,
+        dbhs=dbhs,
+        volumes=volumes,
+    )
+
+    issues = record.validate()
+    if issues:
+        logger.debug(
+            "Skipping Forstpraxis %s (si=%.0f): %s",
+            species_latin, site_index, "; ".join(issues),
+        )
+        return None
+    return record
+
+
 _MODEL_TYPES = {
     "chapman_richards": lambda t, params: (
         params.get("y0", 0.0)
@@ -1122,6 +1358,79 @@ class UsdaStockingPdfProvider(YieldProvider):
         return "available (tabula-py installed)"
 
 
+class ForItProvider(YieldProvider):
+    """Extract volume/phytomass equations from the ForIT R package (Italian NFI).
+
+    ForIT implements the INFC-2005 double-entry volume and phytomass equations
+    for Italian forest tree species (Tabacchi et al. 2011).  It covers 50+
+    species including minor broadleaves like Acer campestre.
+    """
+
+    name = "forit"
+    description = "ForIT: Italian NFI volume and phytomass equations (Tabacchi et al. 2011)"
+
+    def available(self) -> bool:
+        return _r_package_available("ForIT")
+
+    def iter_tables(
+        self,
+        species_mapping: Optional[SpeciesMapping] = None,
+        config: Optional[Dict[str, Any]] = None,
+    ) -> Iterable[YieldTableRecord]:
+        r_script = _get_bundled_r_script("extract_forit.R")
+        if not Path(str(r_script)).exists():
+            logger.error("R script not found: %s", r_script)
+            return
+        mapping = _ensure_mapping(species_mapping)
+        yield from _run_r_extraction(r_script, "forit", mapping)
+
+    def status_message(self) -> str:
+        if self.available():
+            return "available (R + ForIT installed)"
+        if shutil.which("Rscript"):
+            return "R found but ForIT package not installed"
+        return "R not found on PATH"
+
+
+class ForstpraxisPdfProvider(YieldProvider):
+    """Parse German yield table extracts from Forstpraxis Ertragstafelauszuge PDF.
+
+    The AFZ/FHJ Kalender Ertragstafelauszuge PDF compiles yield table extracts
+    for ~20 German species in standardized 10-year age intervals.  This covers
+    species not found in other providers, including hornbeam (Lockow 2009) and
+    small-leaved linden (Bockmann 1990).
+    """
+
+    name = "forstpraxis_et"
+    description = (
+        "Forstpraxis Ertragstafelauszuge: German yield table extracts "
+        "(hornbeam, linden, and others)"
+    )
+
+    def available(self) -> bool:
+        return _tabula_available()
+
+    def iter_tables(
+        self,
+        species_mapping: Optional[SpeciesMapping] = None,
+        config: Optional[Dict[str, Any]] = None,
+    ) -> Iterable[YieldTableRecord]:
+        config = config or {}
+        pdf_path = Path(config.get("pdf_path", ""))
+        if not pdf_path.is_absolute() or not pdf_path.exists():
+            logger.warning(
+                "PDF not found: %s -- provide pdf_path in config", pdf_path,
+            )
+            return
+        mapping = _ensure_mapping(species_mapping)
+        yield from _parse_forstpraxis_pdf(pdf_path, mapping)
+
+    def status_message(self) -> str:
+        if not self.available():
+            return "tabula-py not installed (pip install tabula-py; requires Java)"
+        return "available (tabula-py installed)"
+
+
 class ParametricModelProvider(YieldProvider):
     """Generate synthetic yield tables from parametric growth model parameters.
 
@@ -1174,6 +1483,8 @@ ALL_PROVIDERS: List[YieldProvider] = [
     PryorPdfProvider(),
     NovaScotiaPdfProvider(),
     UsdaStockingPdfProvider(),
+    ForItProvider(),
+    ForstpraxisPdfProvider(),
     ParametricModelProvider(),
 ]
 

@@ -18,6 +18,14 @@ from pylometree.yield_tables.loaders import (
 logger = logging.getLogger(__name__)
 
 
+# Species proxy table: when no yield table is found for the primary species,
+# fall back to a related species with similar growth characteristics.
+# Key = standardized name, value = proxy standardized name.
+SPECIES_PROXIES: Dict[str, str] = {
+    "field_maple": "sycamore_maple",  # Acer campestre -> A. pseudoplatanus
+}
+
+
 def resolve_yield_table(
     species_common: str,
     species_std: str,
@@ -34,6 +42,7 @@ def resolve_yield_table(
     Priority:
         1. Local CSV in yield_tables_dir (by standardized name)
         2. Ingested store (provider-generated CSVs via pylometree-ingest)
+        3. Species proxy (related species with similar growth, see SPECIES_PROXIES)
 
     Unused keyword arguments (``calibration_species``, ``yield_search``)
     are accepted for backward compatibility but ignored.
@@ -54,11 +63,45 @@ def resolve_yield_table(
     Returns:
         YieldTableData or None.
     """
+    result = _try_resolve(
+        species_std, yield_tables_dir, store_dir,
+        preferred_site_index, preferred_region, preferred_h50,
+    )
+    if result:
+        logger.info("  Using yield table: %s", result.title)
+        return result
+
+    # 3. Try species proxy
+    proxy_std = SPECIES_PROXIES.get(species_std)
+    if proxy_std:
+        result = _try_resolve(
+            proxy_std, yield_tables_dir, store_dir,
+            preferred_site_index, preferred_region, preferred_h50,
+        )
+        if result:
+            logger.info(
+                "  Using proxy yield table for %s (proxy: %s): %s",
+                species_common, proxy_std, result.title,
+            )
+            return result
+
+    logger.info("  No yield table found for %s", species_common)
+    return None
+
+
+def _try_resolve(
+    species_std: str,
+    yield_tables_dir: Optional[Path],
+    store_dir: Optional[Path],
+    preferred_site_index: Optional[float],
+    preferred_region: str,
+    preferred_h50: Optional[float],
+) -> Optional[YieldTableData]:
+    """Try local CSV then ingested store for a single species key."""
     # 1. Try local CSV
     if yield_tables_dir and yield_tables_dir.exists():
         local = load_local_yield_table(species_std, yield_tables_dir)
         if local:
-            logger.info("  Using local yield table: %s", local.title)
             return local
 
     # 2. Try ingested store
@@ -71,8 +114,6 @@ def resolve_yield_table(
             preferred_h50=preferred_h50,
         )
         if store_result:
-            logger.info("  Using store yield table: %s", store_result.title)
             return store_result
 
-    logger.info("  No yield table found for %s", species_common)
     return None
