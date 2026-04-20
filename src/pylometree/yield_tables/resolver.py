@@ -23,6 +23,11 @@ logger = logging.getLogger(__name__)
 # Key = standardized name, value = proxy standardized name.
 SPECIES_PROXIES: Dict[str, str] = {
     "field_maple": "sycamore_maple",  # Acer campestre -> A. pseudoplatanus
+    "grand_fir": "silver_fir",  # Abies grandis -> A. alba (same genus)
+    "hornbeam": "european_beech",  # Carpinus betulus -> Fagus sylvatica (shade-tolerant broadleaf)
+    "small_leaved_linden": "european_beech",  # Tilia cordata -> Fagus sylvatica (shade-tolerant broadleaf)
+    "sycamore_maple": "common_ash",  # Acer pseudoplatanus -> Fraxinus excelsior (fast broadleaf)
+    "wild_cherry": "silver_birch",  # Prunus avium -> Betula pendula (pioneer broadleaf)
 }
 
 
@@ -71,19 +76,26 @@ def resolve_yield_table(
         logger.info("  Using yield table: %s", result.title)
         return result
 
-    # 3. Try species proxy
-    proxy_std = SPECIES_PROXIES.get(species_std)
-    if proxy_std:
+    # 3. Try species proxy chain (follow up to 3 hops to avoid cycles)
+    current = species_std
+    visited = {current}
+    for _ in range(3):
+        proxy_std = SPECIES_PROXIES.get(current)
+        if not proxy_std or proxy_std in visited:
+            break
+        visited.add(proxy_std)
         result = _try_resolve(
             proxy_std, yield_tables_dir, store_dir,
             preferred_site_index, preferred_region, preferred_h50,
         )
         if result:
+            chain = " -> ".join(visited)
             logger.info(
-                "  Using proxy yield table for %s (proxy: %s): %s",
-                species_common, proxy_std, result.title,
+                "  Using proxy yield table for %s (%s): %s",
+                species_common, chain, result.title,
             )
             return result
+        current = proxy_std
 
     logger.info("  No yield table found for %s", species_common)
     return None
