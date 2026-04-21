@@ -15,10 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.editorconfig` for cross-editor consistency.
 - `CONTRIBUTING.md` with contribution workflow.
 - `CHANGELOG.md` (this file).
+- `tests/test_io.py`: 6 tests for CSV I/O utilities.
+- `tests/test_crown_models.py`: 14 tests for crown-based allometric models.
+- `tests/test_volume_models.py`: 21 tests for volume and age-from-height models.
 
 ### Changed
 - Internal phases roadmap moved from repo root to
   `docs/internal-phases-roadmap.md`.
+- Python version requirement from `>=3.10` to `>=3.12`.
 
 ### Removed
 - Empty `build/` directory removed from version control.
