@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - MIT `LICENSE` file.
 - `[project.scripts]` entry for the `pylometree-ingest` CLI so it is
   installed on `pip install`.
@@ -20,11 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `tests/test_volume_models.py`: 21 tests for volume and age-from-height models.
 
 ### Changed
+
 - Internal phases roadmap moved from repo root to
   `docs/internal-phases-roadmap.md`.
 - Python version requirement from `>=3.10` to `>=3.12`.
 
 ### Removed
+
 - Empty `build/` directory removed from version control.
 - Local `.mypy_cache/` and `.pytest_cache/` directories removed.
 
