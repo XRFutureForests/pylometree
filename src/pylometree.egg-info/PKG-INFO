@@ -9,11 +9,11 @@ Classifier: Intended Audience :: Science/Research
 Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
 Classifier: Programming Language :: Python :: 3.12
-Requires-Python: >=3.10
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.12
 Description-Content-Type: text/markdown
+License-File: LICENSE
 Requires-Dist: numpy>=1.24
 Requires-Dist: scipy>=1.10
 Requires-Dist: pandas>=2.0
@@ -29,6 +29,7 @@ Requires-Dist: scikit-learn>=1.3; extra == "all"
 Requires-Dist: statsmodels>=0.14; extra == "all"
 Requires-Dist: pytest>=7.4; extra == "all"
 Requires-Dist: pytest-cov>=4.1; extra == "all"
+Dynamic: license-file
 
 # pylometree
 
@@ -90,14 +91,25 @@ from pylometree.models.hd import HD_MODELS
 dbh    = np.array([5, 8, 12, 18, 24, 30, 38, 45])
 height = np.array([6, 9, 13, 17, 21, 24, 27, 29])
 
-# Fit a single model
+# Fit a single model (convenience form – looks up HD_MODELS automatically)
 result = fit_model(dbh, height, model_name="chapman_richards")
 print(result)
-# FitResult(model=chapman_richards, n=8, R²=0.998, RMSE=0.31, AICc=-12.4)
+# FitResult('chapman_richards', R²=0.998, converged=True)
+
+# Predict with the fitted model
+h_pred = result.predict(np.array([10, 20, 30]))
+
+# Or pass an explicit function and parameters
+from pylometree.models.hd import power_law
+result2 = fit_model(
+    fn=power_law, x=dbh, y=height,
+    param_names=["a", "b"], p0=[1.0, 0.5],
+)
 
 # Select the best model from all 12 forms
-best, ranked = select_model(dbh, height)
-print(ranked[["model", "aicc", "r2"]].head())
+best_name, best_result, all_results = select_model(dbh, height)
+# Or with an explicit catalogue:
+best_name, best_result, all_results = select_model(HD_MODELS, x=dbh, y=height)
 ```
 
 ### 2. Estimate biomass
@@ -115,18 +127,27 @@ print(f"AGB = {agb_kg:.1f} kg")
 
 ```python
 from pylometree.data import Tree, Stand
+from pylometree.registry import registry
 
 tree = Tree(dbh=25.0, height=22.0, wood_density=0.60, species="Tectona grandis")
-print(f"AGB  = {tree.agb():.1f} kg")
-print(f"BGB  = {tree.bgb():.1f} kg")
-print(f"C    = {tree.carbon_stock():.1f} kg C")
+
+# Estimate AGB using a published model
+chave = registry.get("chave2014_pantropical")
+tree.estimate_agb(chave)
+print(f"AGB  = {tree.agb:.1f} kg")
+print(f"C    = {tree.carbon_stock:.1f} kg C")
 
 # Build a stand and compute per-hectare stocks
 trees = [Tree(dbh=d, height=h, wood_density=0.65)
          for d, h in zip([15, 20, 25, 18, 22], [12, 17, 20, 14, 18])]
-stand = Stand(trees=trees, plot_area_ha=0.1)
-print(f"AGB  = {stand.agb_mg_ha():.2f} Mg/ha")
-print(f"Carbon = {stand.carbon_stock_mg_ha():.2f} Mg C/ha")
+stand = Stand(trees=trees, plot_area=0.1)
+
+# Apply biomass model to every tree in the stand
+for t in stand:
+    t.estimate_agb(chave)
+
+print(f"AGB  = {stand.agb_mg_ha:.2f} Mg/ha")
+print(f"Carbon = {stand.carbon_stock_mg_ha:.2f} Mg C/ha")
 print(stand.summary_df())
 ```
 
@@ -135,7 +156,9 @@ print(stand.summary_df())
 ```python
 from pylometree.registry import registry
 
-# List all built-in models
+# Summary of all built-in models
+print(registry.summary())
+# DataFrame summary (requires pandas)
 print(registry.summary_df()[["model_id", "model_type", "species", "pub_year"]])
 
 # Query by type and region
@@ -146,7 +169,7 @@ chave = registry.get("chave2014_pantropical")
 agb   = chave.predict(dsob=30.0, hst=25.0, rho=0.55)
 print(f"AGB = {agb:.1f} kg")
 
-# Or use callable syntax
+# Or use callable shortcut on the registry
 agb = registry("chave2014_pantropical", dsob=30.0, hst=25.0, rho=0.55)
 ```
 
@@ -177,17 +200,17 @@ registry.register(ModelEntry(
 ### 6. Load data from CSV
 
 ```python
-from pylometree.io import stand_from_csv
+from pylometree.io import read_csv  # or stand_from_csv (alias)
 
-stand = stand_from_csv(
+stand = read_csv(
     "survey_plot.csv",
-    plot_area_ha=0.25,
+    plot_area=0.25,
     dbh_col="DBH_cm",
     height_col="H_m",
-    wood_density_col="rho",
+    wood_density="rho",       # extra Tree attrs via **kwargs
     species_col="species",
 )
-print(f"n = {len(stand)}, AGB = {stand.agb_mg_ha():.2f} Mg/ha")
+print(f"n = {len(stand)}, BA = {stand.basal_area_per_ha:.1f} m²/ha")
 ```
 
 ---

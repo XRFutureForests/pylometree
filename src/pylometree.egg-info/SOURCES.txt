@@ -1,3 +1,4 @@
+LICENSE
 README.md
 pyproject.toml
 src/pylometree/__init__.py
@@ -37,8 +38,11 @@ src/pylometree/yield_tables/r_scripts/__init__.py
 src/pylometree/yield_tables/r_scripts/extract_et_nwfva.R
 src/pylometree/yield_tables/r_scripts/extract_forest_elements.R
 tests/test_biomass.py
+tests/test_crown_models.py
 tests/test_data.py
 tests/test_fitting.py
 tests/test_hd_models.py
+tests/test_io.py
 tests/test_metrics.py
 tests/test_registry.py
+tests/test_volume_models.py
