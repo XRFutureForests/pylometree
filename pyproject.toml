@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "General-purpose tree allometry toolkit for Python"
 readme = "README.md"
 license = { text = "MIT" }
+authors = [{ name = "XR Future Forests Lab", email = "maximilian.sperlich@gmail.com" }]
 requires-python = ">=3.12"
 keywords = [
     "allometry",
