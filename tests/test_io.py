@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import csv
-import tempfile
 from pathlib import Path
 
 import pytest
 
-from pylometree.io import read_csv
+from pylometree.data.stand import Stand
+from pylometree.data.tree import Tree
+from pylometree.io import read_csv, stand_from_csv, stand_to_dataframe
 
 
 class TestReadCsv:
@@ -74,3 +75,72 @@ class TestReadCsv:
 
         stand = read_csv(csv_path)
         assert len(stand.trees) == 0
+
+    def test_custom_column_names(self, tmp_path: Path):
+        csv_path = tmp_path / "test.csv"
+        with csv_path.open("w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["d", "h", "sp"])
+            writer.writerow([22.0, 19.0, "Betula pendula"])
+
+        stand = read_csv(csv_path, dbh_col="d", height_col="h", species_col="sp")
+        assert stand.trees[0].dbh == pytest.approx(22.0)
+        assert stand.trees[0].species == "Betula pendula"
+
+    def test_species_col_none(self, tmp_path: Path):
+        csv_path = tmp_path / "test.csv"
+        with csv_path.open("w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["dbh", "height"])
+            writer.writerow([12.0, 10.0])
+
+        stand = read_csv(csv_path, species_col=None)
+        assert stand.trees[0].species is None
+
+    def test_string_path_accepted(self, tmp_path: Path):
+        csv_path = tmp_path / "test.csv"
+        with csv_path.open("w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["dbh", "height"])
+            writer.writerow([15.0, 12.0])
+
+        stand = read_csv(str(csv_path))
+        assert len(stand.trees) == 1
+
+
+class TestStandFromCsvAlias:
+    def test_is_same_function(self):
+        assert stand_from_csv is read_csv
+
+
+class TestStandToDataframe:
+    def test_returns_dataframe(self):
+        pd = pytest.importorskip("pandas")
+        stand = Stand(
+            trees=[
+                Tree(dbh=20.0, height=18.0, species="Fagus sylvatica"),
+                Tree(dbh=30.0, height=25.0, species="Picea abies"),
+            ]
+        )
+        df = stand_to_dataframe(stand)
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 2
+
+    def test_expected_columns(self):
+        pd = pytest.importorskip("pandas")
+        stand = Stand(trees=[Tree(dbh=15.0, height=12.0)])
+        df = stand_to_dataframe(stand)
+        for col in ("species", "dbh", "height", "crown_area", "wood_density", "age"):
+            assert col in df.columns
+
+    def test_values_correct(self):
+        pd = pytest.importorskip("pandas")
+        stand = Stand(trees=[Tree(dbh=15.0, height=12.0, species="Betula pendula")])
+        df = stand_to_dataframe(stand)
+        assert df.iloc[0]["dbh"] == pytest.approx(15.0)
+        assert df.iloc[0]["species"] == "Betula pendula"
+
+    def test_empty_stand_returns_empty_df(self):
+        pd = pytest.importorskip("pandas")
+        df = stand_to_dataframe(Stand())
+        assert len(df) == 0

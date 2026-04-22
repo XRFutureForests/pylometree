@@ -16,9 +16,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.editorconfig` for cross-editor consistency.
 - `CONTRIBUTING.md` with contribution workflow.
 - `CHANGELOG.md` (this file).
-- `tests/test_io.py`: 6 tests for CSV I/O utilities.
-- `tests/test_crown_models.py`: 14 tests for crown-based allometric models.
-- `tests/test_volume_models.py`: 21 tests for volume and age-from-height models.
+- `tests/test_io.py`: extended to 14 tests covering `stand_from_csv` alias,
+  `stand_to_dataframe`, custom column names, `species_col=None`, and string
+  path inputs.
+- `tests/test_crown_models.py`: 13 tests for crown-based allometric models
+  (`agb_from_crown`, Jucker 2017, DBH-from-crown, geometry conversions,
+  crown ratio, and catalogue smoke-test).
+- `tests/test_volume_models.py`: 18 tests for volume models (cylinder,
+  form-factor, power-law, conoid frustum, volume→AGB) and Chapman-Richards
+  height-age with inverse roundtrip.
+- `tests/test_registry.py`: 16 additional tests covering `to_dict`
+  serialisation, missing-covariate `ValueError`, registry `__call__`
+  shortcut, `pub_year_min` / `response` filters, isolated `ModelRegistry`
+  operations (register_many, summary, summary_df).
 
 ### Changed
 
