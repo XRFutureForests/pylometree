@@ -15,72 +15,20 @@ Support for XRFF-39 (height gap-fill in digital-twin-db)  ← no code changes he
 
 ---
 
-## XRFF-131 — Publish pylometree to PyPI (Medium, assignee: Max)
+## XRFF-131 — Keep git-based dependency (Medium, assignee: Max)
 
-**Context**: `growpy/pyproject.toml` currently uses `pylometree @ git+https://gitlab.uni-freiburg.de/...`. This works but is fragile (requires repo access, no version pinning). PyPI enables `pip install pylometree==0.1.0`.
+**Decision**: Skip PyPI publication for now. Keep `growpy/pyproject.toml` using the git-based dependency:
 
-### Steps
-
-**1. Add `[project.urls]` to `pyproject.toml`**
-
-```toml
-[project.urls]
-Homepage = "https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree"
-Repository = "https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree"
-"Bug Tracker" = "https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree/-/issues"
-```
-
-**2. Verify `version = "0.1.0"` and all metadata in `pyproject.toml`**
-
-Check: `name`, `description`, `authors`, `license`, `requires-python`, `dependencies`, `classifiers` — all already filled in. Confirm `README.md` renders correctly (it's the PyPI description).
-
-**3. Install build tools**
-
-```bash
-pip install build twine
-```
-
-**4. Build**
-
-```bash
-cd /d/Git/pylometree
-python -m build
-# Creates dist/pylometree-0.1.0.tar.gz and dist/pylometree-0.1.0-py3-none-any.whl
-```
-
-**5. Check with twine**
-
-```bash
-twine check dist/*
-```
-
-Fix any warnings before upload.
-
-**6. Upload to PyPI**
-
-```bash
-twine upload dist/*
-# Prompts for PyPI username + API token
-# Get token at: https://pypi.org/manage/account/token/
-```
-
-**7. Verify install**
-
-```bash
-pip install pylometree==0.1.0
-python -c "import pylometree; print(pylometree.__version__)"
-```
-
-**8. Update growpy dependency**
-
-In `growpy/pyproject.toml`, replace:
 ```toml
 "pylometree @ git+https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree.git",
 ```
-with:
-```toml
-"pylometree>=0.1.0",
-```
+
+**Rationale**: PyPI adds friction (token management, versioning discipline, release overhead) without immediate benefit. The git-based dep works fine for the current team size and workflow. Revisit PyPI when external users need the package.
+
+**Open questions**:
+
+- When should we reconsider? (external collaborators, public ecosystem, CI/CD simplification)
+- What versioning discipline is needed regardless of install method? (semver, changelog)
 
 ---
 
