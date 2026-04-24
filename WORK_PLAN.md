@@ -2,39 +2,35 @@
 
 Linear: [XRFF team](https://linear.app/geosense-ufr/team/XRFF/all)
 
-## Issue Sequence
+# pylometree — Work Plan
 
-```
-XRFF-131  (publish to PyPI — enables proper versioned dep)
-    └─► update growpy pyproject.toml to use PyPI dep
+Linear: [XRFF team](https://linear.app/geosense-ufr/team/XRFF/all)
 
-Support for XRFF-39 (height gap-fill in digital-twin-db)  ← no code changes here,
-                                                              just verify H-D model
-                                                              coverage for Ecosense species
-```
+**Last updated:** 2026-04-23
 
 ---
 
-## XRFF-131 — Keep git-based dependency (Medium, assignee: Max)
+## Status
 
-**Decision**: Skip PyPI publication for now. Keep `growpy/pyproject.toml` using the git-based dependency:
+🟢 **XRFF-131 complete.** Decision: skip PyPI, keep git-based dependency.
 
-```toml
-"pylometree @ git+https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree.git",
-```
+---
 
-**Rationale**: PyPI adds friction (token management, versioning discipline, release overhead) without immediate benefit. The git-based dep works fine for the current team size and workflow. Revisit PyPI when external users need the package.
+## Completed
 
-**Open questions**:
+| Issue | Status | Notes |
+|---|---|---|
+| [XRFF-131](https://linear.app/geosense-ufr/issue/XRFF-131) Publish pylometree to PyPI | ✅ DONE | Decision: skip PyPI, keep git dep in growpy/pyproject.toml |
 
-- When should we reconsider? (external collaborators, public ecosystem, CI/CD simplification)
-- What versioning discipline is needed regardless of install method? (semver, changelog)
+### Decision rationale
+
+PyPI adds friction (token management, versioning discipline, release overhead) without immediate benefit. Git-based dep works fine for current team size/workflow. Revisit when external users need the package.
 
 ---
 
 ## Support: XRFF-39 (height gap-fill) — no code changes needed
 
-digital-twin-db will call `pylometree` H-D models to predict missing heights. Verify coverage now:
+digital-twin-db will call `pylometree` H-D models to predict missing heights. Verify coverage:
 
 ```python
 from pylometree.yield_tables import get_yield_table
