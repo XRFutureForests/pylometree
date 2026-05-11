@@ -1,0 +1,101 @@
+{
+  "SOURCE_DOC_NOTES": {
+    "project": {
+      "name": "pylometree",
+      "version": "0.1.0",
+      "description": "General-purpose Python toolkit for tree allometry — fitting, evaluating, and looking up allometric equations for H-D relationships, above- and below-ground biomass, crown structure, stem volume, and height-age growth.",
+      "license": "MIT",
+      "python_requires": ">=3.12",
+      "repo_url": "https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree",
+      "org": "XR Future Forests Lab, University of Freiburg"
+    },
+    "tech_stack_notes": {
+      "language": "Python 3.12+",
+      "build": "setuptools>=61",
+      "required_deps": ["numpy>=1.24", "scipy>=1.10", "pandas>=2.0"],
+      "optional_deps": {
+        "ml": ["scikit-learn>=1.3"],
+        "stats": ["statsmodels>=0.14"],
+        "dev": ["pytest>=7.4", "pytest-cov>=4.1"],
+        "yield_tables_providers": ["R + ForestElementsR", "R + et.nwfva", "openpyxl", "tabula-py + Java"]
+      },
+      "src_layout": "src/pylometree/",
+      "package_manager": "pip (uv compatible)",
+      "install_dev": "pip install -e \".[dev]\""
+    },
+    "architecture_notes": {
+      "layers": [
+        {"name": "models", "path": "src/pylometree/models/", "role": "Pure equation functions (hd, biomass, crown, volume) — no I/O, no state, vectorized over NumPy arrays"},
+        {"name": "fitting", "path": "src/pylometree/fitting/", "role": "scipy curve_fit wrapper, bootstrap CIs, AIC-based select_model"},
+        {"name": "metrics", "path": "src/pylometree/metrics/", "role": "R2, RMSE, MAE, bias, AIC, AICc, MSA (Burt & Disney), SSPB (Burt & Disney)"},
+        {"name": "registry", "path": "src/pylometree/registry/", "role": "Searchable model registry — ModelEntry + ModelRegistry, pre-loaded published equations"},
+        {"name": "data", "path": "src/pylometree/data/", "role": "Tree and Stand dataclasses with plot-level aggregation and AGB/carbon stock estimation"},
+        {"name": "io", "path": "src/pylometree/io/", "role": "Thin CSV/DataFrame adapters to Tree/Stand"},
+        {"name": "yield_tables", "path": "src/pylometree/yield_tables/", "role": "Self-contained subsystem: multi-source ingestion (providers.py), normalization, offline-first runtime resolution (resolver.py), CLI (pylometree-ingest)"}
+      ],
+      "key_decisions": [
+        "Variable naming follows allometric R package: dsob (DBH outside bark cm), hst (stem height m)",
+        "Strict model_type matching in registry — agb does not match crown_agb",
+        "Back-transformation bias correction via Sprugel 1983 (CF = e^{MSE/2}) applied explicitly",
+        "No implicit unit conversion — callers pass correct units per model docstring",
+        "Yield-table resolution is offline-first — no API calls at query time",
+        "No PyPI publication — git-based dependency (decision XRFF-131)"
+      ],
+      "extension_points": [
+        "Custom equation: registry.register(ModelEntry(...))",
+        "New yield table provider: subclass YieldTableProvider in yield_tables/providers.py",
+        "New H-D/biomass form: add function to module, add to _MODELS dict"
+      ]
+    },
+    "requirements_notes": {
+      "functional": [
+        "Fit 12 H-D equation forms to field data with scipy curve_fit wrapper",
+        "AIC-based model selection across all H-D forms",
+        "Bootstrap confidence intervals for fitted parameters",
+        "Estimate AGB with power-law M1-M4, Chave 2014 pantropical, Musa NSUR, and crown-based equations (Jucker 2017, Htoo 2025)",
+        "Estimate stem volume with form-factor and power-law models",
+        "Tree and Stand dataclasses with carbon stock computation and per-hectare aggregation",
+        "Searchable registry of published allometric equations (queryable by type, species, region)",
+        "CSV and DataFrame ingestion to Tree/Stand",
+        "Yield table ingestion from R packages, Excel, PDF, and JSON parametric models",
+        "Offline-first yield table resolution by species, region, site index",
+        "CLI (pylometree-ingest) for yield table store management",
+        "MSA and SSPB metrics for asymmetric biomass error characterization"
+      ],
+      "non_functional": [
+        "Python >=3.12",
+        "No network access at runtime (yield tables offline-first)",
+        "Graceful provider disabling when optional deps missing"
+      ]
+    },
+    "principles_notes": {
+      "principles": [
+        "Pure functions in models/ — no I/O, no state",
+        "Strict model type matching — no implicit cross-type queries",
+        "Explicit back-transformation bias correction — not silent",
+        "No implicit unit conversion — document units in every docstring",
+        "Offline-first for yield tables",
+        "Src layout for clean package separation",
+        "Black 88-char formatting, snake_case, type hints on public functions"
+      ],
+      "code_style": "Black (88 char), snake_case, type hints on public API, allometric R naming convention (dsob, hst)",
+      "contributing": "One logical change per MR, update CHANGELOG.md under [Unreleased], pytest required"
+    },
+    "infrastructure_notes": {
+      "ci": "None documented",
+      "deployment": "Git-based dependency (no PyPI)",
+      "environments": ["development"],
+      "data_files": "data/ directory for yield tables and input CSVs",
+      "issue_tracker": "GitLab: https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree/-/issues",
+      "linear_workspace": "linear.app/geosense-ufr/team/XRFF"
+    },
+    "published_models": [
+      {"id": "chave2014_pantropical", "type": "agb", "ref": "Chave et al. 2014 GCB 20:3177"},
+      {"id": "jucker2017_crown_agb", "type": "crown_agb", "ref": "Jucker et al. 2017 GCB 23:177"},
+      {"id": "laskar2020_musa_agb", "type": "agb", "ref": "Laskar et al. 2020 JEM"},
+      {"id": "laskar2020_musa_hd_exponential", "type": "hd", "ref": "Laskar et al. 2020"},
+      {"id": "chapman_richards_generic_hd", "type": "hd", "ref": "Richards 1959"},
+      {"id": "pretzsch2025_*_height_age", "type": "height_age", "ref": "Pretzsch et al. 2025 Trees doi:10.1007/s00468-025-02692-0"}
+    ]
+  }
+}
