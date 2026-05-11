@@ -2,6 +2,9 @@
 
 High-level overview of how `pylometree` is organized and how the pieces fit together.
 
+> **Canonical source moved**: Architecture documentation is now at [docs/project/architecture.md](project/architecture.md). This file is preserved for reference but will not be updated.
+
+
 ## Package layout
 
 ```text
