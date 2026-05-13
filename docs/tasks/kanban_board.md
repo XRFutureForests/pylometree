@@ -1,20 +1,21 @@
 # Task Navigation
 
-<!-- SCOPE: Quick navigation to active tasks in Linear -->
+<!-- SCOPE: Quick navigation to active tasks in Linear. Scoped to: pylometree (Epic 9). -->
 <!-- DOC_KIND: how-to -->
 <!-- DOC_ROLE: working -->
 <!-- READ_WHEN: Read when you need the current board, provider setup, or epic/story/task navigation. -->
 <!-- SKIP_WHEN: Skip when you only need workflow policy or template rules. -->
-<!-- PRIMARY_SOURCES: .hex-skills/environment_state.json, docs/tasks/README.md, Linear XRFF team -->
+<!-- PRIMARY_SOURCES: docs/tasks/README.md, Linear XRFF team -->
 <!-- DO NOT add here: task descriptions, implementation notes, workflow rules → tasks/README.md -->
 
-> **Last Updated**: 2026-05-11 (Hierarchical format: Status → Epic → Story → Tasks)
+> **Last Updated**: 2026-05-13 (Hierarchical format: Status → Epic → Story → Tasks)
 
 ## Quick Navigation
 
 - [Task Rules](./README.md)
 - [Architecture](../project/architecture.md)
 - [Requirements](../project/requirements.md)
+- [Workspace Board](../../docs/tasks/kanban_board.md) — all epics across all repos
 
 ## Agent Entry
 
@@ -37,8 +38,9 @@
 
 | Variable | Value | Description |
 |----------|-------|-------------|
-| **Team** | XRFF | Linear team name |
-| **Workspace** | geosense-ufr | Linear workspace slug |
+| **Team Name** | XR Future Forests | Linear team name |
+| **Team UUID** | 5e3b87df-5f1a-4f70-8621-4ced0ed7bdcf | Team UUID for API calls |
+| **Team Key** | XRFF | Short key for issues |
 | **Workspace URL** | https://linear.app/geosense-ufr | Linear workspace |
 
 **Quick Access:**
@@ -46,11 +48,17 @@
 - [Active](https://linear.app/geosense-ufr/team/XRFF/active)
 - [All Issues](https://linear.app/geosense-ufr/team/XRFF/all)
 
-### Common Configuration
+---
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-| **Next Epic Number** | 1 | Next available Epic number |
+## Repo Scope
+
+This repo contributes to:
+
+| Epic # | Name | Initiative | URL |
+|--------|------|------------|-----|
+| Epic 9 | Research & Publications | Scientific Infrastructure | [link](https://linear.app/geosense-ufr/project/research-and-publications-25392ece7fec) |
+
+> For all epics across all repos, see the [workspace kanban board](../../docs/tasks/kanban_board.md).
 
 ---
 
@@ -58,7 +66,7 @@
 
 | Epic | Last Story | Next Story | Last Task | Next Task |
 |------|------------|------------|-----------|-----------|
-| Epic 0 | - | US001 | - | T001 |
+| Epic 9 (Research & Publications) | — | US001 | — | T001 |
 
 > Story numbering: US001+ per Epic. Task numbering: T001+ per Story.
 
@@ -70,9 +78,7 @@
 
 ### Backlog
 
-**Epic 0: Common Tasks**
-
-  - _(No active stories. Run ln-210-epic-coordinator to decompose scope.)_
+No active backlog items.
 
 ### Todo
 
@@ -122,5 +128,4 @@ _(empty)_
 - [ ] XRFF team links work
 - [ ] Next counters reflect current board state
 
-**Last Updated:** 2026-05-11
-
+**Last Updated:** 2026-05-13

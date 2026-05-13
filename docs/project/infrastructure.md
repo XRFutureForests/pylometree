@@ -105,7 +105,7 @@ No automated CI/CD pipeline is currently configured. Tests are run locally by co
 | Role | Contact |
 |------|---------|
 | Maintainer | maximilian.sperlich@gmail.com |
-| Organisation | XR Future Forests Lab, University of Freiburg (FoWiTA project) |
+| Organisation | XR Future Forests Lab, University of Freiburg (funded by Eva Mayr-Stihl Stiftung) |
 
 ## Maintenance
 

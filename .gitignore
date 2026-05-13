@@ -22,3 +22,5 @@ venv/
 .mypy_cache/
 .coverage
 htmlcov/
+
+tests/manual/results/
