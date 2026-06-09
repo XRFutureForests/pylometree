@@ -20,6 +20,7 @@ from numpy.typing import ArrayLike
 from scipy.optimize import curve_fit
 
 from pylometree import metrics as met
+from pylometree.units import Units, convert_units, set_units
 
 # ---------------------------------------------------------------------------
 # Result container
@@ -48,6 +49,8 @@ class FitResult:
         Bootstrap lower CI bounds (empty if bootstrap not run).
     ci_upper : dict[str, float]
         Bootstrap upper CI bounds (empty if bootstrap not run).
+    units : Units
+        Unit information for response and covariates.
     """
 
     model_name: str
@@ -59,14 +62,17 @@ class FitResult:
     ci_lower: dict[str, float] = field(default_factory=dict)
     ci_upper: dict[str, float] = field(default_factory=dict)
     fn: Optional[Callable] = field(default=None, repr=False)
+    units: dict[str, str] = field(default_factory=dict)
 
-    def predict(self, x: ArrayLike) -> np.ndarray:
+    def predict(self, x: ArrayLike, output_unit: str | None = None) -> np.ndarray:
         """Predict with the fitted model.
 
         Parameters
         ----------
         x : array-like or tuple of array-like
             Covariate(s) in the same format used for fitting.
+        output_unit : str, optional
+            Target unit for output. If provided, converts from fitted units.
 
         Returns
         -------
@@ -79,9 +85,16 @@ class FitResult:
             )
         if isinstance(x, tuple):
             x_in = tuple(np.asarray(xi, dtype=float) for xi in x)
-            return self.fn(*x_in, *self.params.values())
-        x_in = np.asarray(x, dtype=float)
-        return self.fn(x_in, *self.params.values())
+            pred = self.fn(*x_in, *self.params.values())
+        else:
+            x_in = np.asarray(x, dtype=float)
+            pred = self.fn(x_in, *self.params.values())
+
+        # Convert units if specified
+        if output_unit and "response" in self.units:
+            pred = convert_units(pred, self.units["response"], output_unit)
+
+        return pred
 
     def __repr__(self) -> str:
         r2v = self.metrics.get("r2", float("nan"))

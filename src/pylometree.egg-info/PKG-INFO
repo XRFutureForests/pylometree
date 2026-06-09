@@ -2,6 +2,7 @@ Metadata-Version: 2.4
 Name: pylometree
 Version: 0.1.0
 Summary: General-purpose tree allometry toolkit for Python
+Author-email: XR Future Forests Lab <maximilian.sperlich@gmail.com>
 License: MIT
 Keywords: allometry,forestry,biomass,tree,height-diameter,carbon
 Classifier: Development Status :: 3 - Alpha
@@ -17,6 +18,7 @@ License-File: LICENSE
 Requires-Dist: numpy>=1.24
 Requires-Dist: scipy>=1.10
 Requires-Dist: pandas>=2.0
+Requires-Dist: pint>=0.21
 Provides-Extra: ml
 Requires-Dist: scikit-learn>=1.3; extra == "ml"
 Provides-Extra: stats
@@ -24,6 +26,7 @@ Requires-Dist: statsmodels>=0.14; extra == "stats"
 Provides-Extra: dev
 Requires-Dist: pytest>=7.4; extra == "dev"
 Requires-Dist: pytest-cov>=4.1; extra == "dev"
+Requires-Dist: basedpyright>=1.39.7; extra == "dev"
 Provides-Extra: all
 Requires-Dist: scikit-learn>=1.3; extra == "all"
 Requires-Dist: statsmodels>=0.14; extra == "all"

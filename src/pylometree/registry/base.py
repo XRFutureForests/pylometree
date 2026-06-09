@@ -23,6 +23,9 @@ from typing import Any, Callable, Optional
 
 import numpy as np
 
+from pylometree.taxonomy import Taxa, Taxon
+from pylometree.units import Units
+
 # ---------------------------------------------------------------------------
 # ModelEntry
 # ---------------------------------------------------------------------------
@@ -73,6 +76,7 @@ class ModelEntry:
     parameters: dict[str, float]
     fn: Callable
     species: list[str] = field(default_factory=list)
+    taxa: list[Taxon] = field(default_factory=list)
     region: list[str] = field(default_factory=list)
     reference: str = ""
     pub_year: Optional[int] = None
@@ -134,6 +138,7 @@ class ModelEntry:
             "covariates": self.covariates,
             "parameters": self.parameters,
             "species": self.species,
+            "taxa": [t.__dict__ for t in self.taxa],
             "region": self.region,
             "reference": self.reference,
             "pub_year": self.pub_year,
@@ -189,6 +194,7 @@ class ModelRegistry:
         *,
         model_type: Optional[str] = None,
         species: Optional[str] = None,
+        taxa: Optional[Taxon] = None,
         region: Optional[str] = None,
         response: Optional[str] = None,
         pub_year_min: Optional[int] = None,
@@ -204,6 +210,8 @@ class ModelRegistry:
             E.g. ``"agb"``, ``"hd"``, ``"volume"``.
         species : str, optional
             Genus or species name (partial match against ``entry.species``).
+        taxa : Taxon, optional
+            Taxonomic classification for rigorous species searching.
         region : str, optional
             Geographic region (partial match against ``entry.region``).
         response : str, optional
@@ -222,6 +230,8 @@ class ModelRegistry:
                 for e in results
                 if not e.species or any(sp in s.lower() for s in e.species)
             ]
+        if taxa is not None:
+            results = [e for e in results if any(taxa.matches(t) for t in e.taxa)]
         if region is not None:
             reg = region.lower()
             results = [

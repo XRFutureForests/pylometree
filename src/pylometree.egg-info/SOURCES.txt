@@ -2,6 +2,8 @@ LICENSE
 README.md
 pyproject.toml
 src/pylometree/__init__.py
+src/pylometree/taxonomy.py
+src/pylometree/units.py
 src/pylometree.egg-info/PKG-INFO
 src/pylometree.egg-info/SOURCES.txt
 src/pylometree.egg-info/dependency_links.txt
@@ -45,4 +47,6 @@ tests/test_hd_models.py
 tests/test_io.py
 tests/test_metrics.py
 tests/test_registry.py
+tests/test_taxonomy.py
+tests/test_units.py
 tests/test_volume_models.py
