@@ -383,7 +383,7 @@ def calculate_density(
     volume: Union[float, int, ndarray, Series, pint.Quantity],
     mass_unit: str = "kg",
     volume_unit: str = "m^3",
-) -> Union[float, ndarray]:
+) -> pint.Quantity:
     """Calculate density from mass and volume.
 
     Args:
@@ -397,7 +397,7 @@ def calculate_density(
 
     Example:
         >>> calculate_density(100, 0.5)
-        200.0
+        200.0 * kilogram / meter ** 3
         >>> calculate_density(set_units(100, "kg"), set_units(0.5, "m^3"))
         200.0 * kilogram / meter ** 3
     """

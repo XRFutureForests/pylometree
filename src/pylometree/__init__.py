@@ -25,9 +25,7 @@ from pylometree.data.stand import Stand
 from pylometree.data.tree import Tree
 from pylometree.registry.base import ModelEntry, ModelRegistry, registry
 from pylometree.taxonomy import Taxa, Taxon, search_by_taxon, search_by_taxonomic_level
-from pylometree.units import Units
-from pylometree.units import Units as units
-from pylometree.units import convert_units, set_units
+from pylometree.units import Units, convert_units, set_units, units
 
 __all__ = [
     "__version__",
