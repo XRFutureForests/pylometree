@@ -41,7 +41,7 @@ git clone https://github.com/your-org/pylometree
 pip install -e ".[dev]"
 ```
 
-Requires **Python ≥ 3.10**.
+Requires **Python ≥ 3.12**.
 
 ---
 
@@ -194,7 +194,7 @@ print(f"n = {len(stand)}, BA = {stand.basal_area_per_ha:.1f} m²/ha")
 | `hyperbolic` | $H = a + b/D$ |
 | `michaelis_menten` | $H = aD/(b+D)$ |
 | `power_law` | $H = aD^b$ |
-| `log_linear` | $H = a + b\ln D$ |
+| `log_linear` | $H = e^{a+b\ln D}$ |
 | `logistic_3p` | $H = a/(1+e^{b-cD})$ |
 | `weibull_4p` | $H = a(1-e^{-bD^c})+d$ |
 | `korf` | $H = a\cdot e^{-b/D^c}$ |
@@ -241,23 +241,23 @@ The `pylometree.yield_tables` module ingests, normalizes, and resolves forestry 
 
 ### Ingestion
 
-Run `pylometree-ingest` to extract yield tables from external sources into a local store:
+Run `python -m pylometree.yield_tables.cli` to extract yield tables from external sources into a local store:
 
 ```bash
 # List available providers and their status
-pylometree-ingest --list-providers
+python -m pylometree.yield_tables.cli --list-providers
 
 # Ingest all available providers into a store directory
-pylometree-ingest --store-dir ./yield_store
+python -m pylometree.yield_tables.cli --store-dir ./yield_store
 
 # Ingest specific providers with config
-pylometree-ingest \
+python -m pylometree.yield_tables.cli \
   --providers forest_elements et_nwfva carbon_et_xlsx \
   --config xlsx_path=/data/C_ET_pub.xlsx \
   --store-dir ./yield_store
 
 # Clean store before re-ingesting
-pylometree-ingest --clean --store-dir ./yield_store
+python -m pylometree.yield_tables.cli --clean --store-dir ./yield_store
 ```
 
 ### Providers
