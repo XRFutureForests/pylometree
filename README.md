@@ -37,7 +37,7 @@ pip install "pylometree[dev]"
 From source:
 
 ```bash
-git clone https://github.com/your-org/pylometree
+git clone https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree
 pip install -e ".[dev]"
 ```
 

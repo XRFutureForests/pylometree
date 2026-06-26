@@ -37,7 +37,7 @@ XR Future Forests Lab at the University of Freiburg.
 
 ## Code style
 
-- **Python**: Black (88 char line length), snake_case, type hints on public
+- **Python**: `ruff format` / `ruff check`, snake_case, type hints on public
   functions.
 - **Naming convention**: follows the [allometric R package](https://allometric.org/):
   `dsob` (DBH outside bark, cm), `hst` (stem height, m).

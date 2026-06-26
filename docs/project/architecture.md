@@ -22,7 +22,7 @@
 - [Docs Hub](../README.md)
 - [Requirements](requirements.md)
 - [Tech Stack](tech_stack.md)
-- [Original architecture overview](../architecture.md)
+
 - [API Reference](../api-reference.md)
 
 ## Agent Entry

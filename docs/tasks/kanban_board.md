@@ -15,7 +15,7 @@
 - [Task Rules](./README.md)
 - [Architecture](../project/architecture.md)
 - [Requirements](../project/requirements.md)
-- [Workspace Board](../../docs/tasks/kanban_board.md) — all epics across all repos
+- Workspace Board — all epics across all repos
 
 ## Agent Entry
 

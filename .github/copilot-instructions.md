@@ -10,7 +10,7 @@ pytest                        # runs tests/ with -v (see pyproject.toml)
 pytest tests/test_hd_models.py -k "TestMonotonicity"  # targeted run
 ```
 
-Requires **Python ≥ 3.10**. Core deps: NumPy, SciPy, pandas.
+Requires **Python ≥ 3.12**. Core deps: NumPy, SciPy, pandas.
 
 ## Architecture
 
