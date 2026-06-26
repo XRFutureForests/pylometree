@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software or its outputs in a publication, please cite it as below."
+title: "pylometree — A Python Toolkit for Tree Allometry"
+type: software
+version: 0.1.0
+date-released: "2026-04-02"
+license: CC-BY-NC-4.0
+repository-code: "https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree"
+# doi: 10.5281/zenodo.XXXXXXX   # uncomment after first Zenodo deposit (use the CONCEPT DOI)
+abstract: >-
+  A general-purpose Python toolkit for tree allometry — fitting, evaluating,
+  and looking up allometric equations for height-diameter relationships,
+  above- and below-ground biomass, crown structure, stem volume, and
+  height-age growth. Pre-loaded with published equations and a searchable
+  model registry.
+keywords:
+  - allometry
+  - biomass
+  - height-diameter
+  - yield-tables
+  - forestry
+  - python
+authors:
+  - family-names: "Sperlich"
+    given-names: "Maximilian"
+    orcid: "https://orcid.org/0009-0003-6131-6244"
+    affiliation: "University of Freiburg"

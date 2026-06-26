@@ -345,4 +345,22 @@ The `parametric_models` provider evaluates JSON growth model files (Chapman-Rich
 
 ## License
 
-MIT © pylometree contributors
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
+This project is licensed under the
+[Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
+You may use, share, and adapt it for **non-commercial** purposes with attribution;
+commercial use is not permitted. See [LICENSE](LICENSE). Note: CC BY-NC is not an
+OSI-approved license — this is intentional, to keep the project non-commercial.
+
+## Citation
+
+<!-- After the first Zenodo release, replace XXXXXXX and uncomment the badge. -->
+<!-- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
+
+If you use pylometree in a publication, please cite it. See
+[CITATION.cff](CITATION.cff) for machine-readable metadata, or:
+
+> Sperlich, M. (2026). pylometree: A Python Toolkit for Tree Allometry.
+> University of Freiburg.
+> https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree
