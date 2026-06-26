@@ -29,7 +29,7 @@
 
 ## Overview
 
-This folder contains the project's task management system, organizing all development work into trackable units with clear status progression. Task provider: **Linear** (workspace: `geosense-ufr`, team: `XRFF`).
+This folder contains the project's task management system, organizing all development work into trackable units with clear status progression. Task provider: **Linear** (workspace: `xr-future-forests-lab`, team: `XRFF`).
 
 ### Folder Structure
 
@@ -92,7 +92,7 @@ Backlog/Postponed → Todo → In Progress → To Review → Done
 
 ### Rule 1: Task Provider Integration
 
-**CRITICAL**: Use `mcp__linear__*` methods for all task operations (team: `XRFF`, workspace: `geosense-ufr`).
+**CRITICAL**: Use `mcp__linear__*` methods for all task operations (team: `XRFF`, workspace: `xr-future-forests-lab`).
 
 **Prohibited**: Direct Linear API, GitHub CLI, file-based task tracking.
 
@@ -181,7 +181,7 @@ pytest --cov=pylometree
 
 | Variable | Value |
 |----------|-------|
-| Workspace | `geosense-ufr` |
+| Workspace | `xr-future-forests-lab` |
 | Team | `XRFF` |
 | Issue tracker | https://linear.app/geosense-ufr/team/XRFF/all |
 
@@ -217,7 +217,7 @@ pytest --cov=pylometree
 - When Linear team coordinates change
 
 **Verification:**
-- [ ] Linear team coordinates correct (workspace: geosense-ufr, team: XRFF)
+- [ ] Linear team coordinates correct (workspace: xr-future-forests-lab, team: XRFF)
 - [ ] Workflow skills table matches available skills
 - [ ] Critical Rules align with current development principles
 - [ ] Quality commands match current pyproject.toml
