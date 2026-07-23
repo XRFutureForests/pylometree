@@ -6,22 +6,22 @@ version: 0.1.0
 date-released: "2026-04-02"
 license: AGPL-3.0-or-later
 repository-code: "https://github.com/XRFutureForests/pylometree"
-# doi: 10.5281/zenodo.XXXXXXX   # uncomment after first Zenodo deposit (use the CONCEPT DOI)
+doi: 10.5281/zenodo.21509863
 abstract: >-
-  A general-purpose Python toolkit for tree allometry — fitting, evaluating,
-  and looking up allometric equations for height-diameter relationships,
-  above- and below-ground biomass, crown structure, stem volume, and
-  height-age growth. Pre-loaded with published equations and a searchable
-  model registry.
+    A general-purpose Python toolkit for tree allometry — fitting, evaluating,
+    and looking up allometric equations for height-diameter relationships,
+    above- and below-ground biomass, crown structure, stem volume, and
+    height-age growth. Pre-loaded with published equations and a searchable
+    model registry.
 keywords:
-  - allometry
-  - biomass
-  - height-diameter
-  - yield-tables
-  - forestry
-  - python
+    - allometry
+    - biomass
+    - height-diameter
+    - yield-tables
+    - forestry
+    - python
 authors:
-  - family-names: "Sperlich"
-    given-names: "Maximilian"
-    orcid: "https://orcid.org/0009-0003-6131-6244"
-    affiliation: "University of Freiburg"
+    - family-names: "Sperlich"
+      given-names: "Maximilian"
+      orcid: "https://orcid.org/0009-0003-6131-6244"
+      affiliation: "University of Freiburg"
