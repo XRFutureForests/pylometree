@@ -1,6 +1,6 @@
-# pylometree
+# pylometree — A Python Toolkit for Tree Allometry
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21509863.svg)](https://doi.org/10.5281/zenodo.21509863)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21509863-blue)](https://doi.org/10.5281/zenodo.21509863)
 
 A general-purpose Python toolkit for tree allometry — fitting, evaluating, and looking up allometric equations for height–diameter relationships, above- and below-ground biomass, crown structure, stem volume, and height–age growth.
 
