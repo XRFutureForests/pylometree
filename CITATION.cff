@@ -4,8 +4,8 @@ title: "pylometree — A Python Toolkit for Tree Allometry"
 type: software
 version: 0.1.0
 date-released: "2026-04-02"
-license: CC-BY-NC-4.0
-repository-code: "https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree"
+license: AGPL-3.0-or-later
+repository-code: "https://github.com/XRFutureForests/pylometree"
 # doi: 10.5281/zenodo.XXXXXXX   # uncomment after first Zenodo deposit (use the CONCEPT DOI)
 abstract: >-
   A general-purpose Python toolkit for tree allometry — fitting, evaluating,

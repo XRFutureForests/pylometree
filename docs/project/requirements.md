@@ -55,7 +55,7 @@ This document specifies the functional requirements for **pylometree** — a gen
 
 - Architecture: [architecture.md](architecture.md)
 - API Reference: [../api-reference.md](../api-reference.md)
-- GitLab issues: https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree/-/issues
+- GitLab issues: https://github.com/XRFutureForests/pylometree/issues
 
 ---
 

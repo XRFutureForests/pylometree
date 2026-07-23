@@ -7,7 +7,7 @@ name = "pylometree"
 version = "0.1.0"
 description = "General-purpose tree allometry toolkit for Python"
 readme = "README.md"
-license = "CC-BY-NC-4.0"
+license = "AGPL-3.0-or-later"
 authors = [
     { name = "XR Future Forests Lab", email = "maximilian.sperlich@gmail.com" },
 ]

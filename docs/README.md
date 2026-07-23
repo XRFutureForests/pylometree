@@ -64,7 +64,7 @@
 
 ## Scope Note
 
-`pylometree` is a general-purpose library with no dependency on any specific inventory format, database, or rendering pipeline. Within XR Future Forests Lab it is used by [growpy](https://gitlab.uni-freiburg.de/xr-future-forests-lab/growpy) for yield-table-driven growth calibration and by [digital-twin-db](https://gitlab.uni-freiburg.de/xr-future-forests-lab/digital-twin-db) consumers that compute derived attributes.
+`pylometree` is a general-purpose library with no dependency on any specific inventory format, database, or rendering pipeline. Within XR Future Forests Lab it is used by [growpy](https://github.com/XRFutureForests/growpy) for yield-table-driven growth calibration and by [digital-twin-db](https://github.com/XRFutureForests/digital-twin-db) consumers that compute derived attributes.
 
 ---
 

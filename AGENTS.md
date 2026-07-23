@@ -18,7 +18,7 @@ General-purpose Python toolkit for tree allometry — fitting, evaluating, and l
 | Principles | [docs/principles.md](docs/principles.md) |
 | Architecture | [docs/project/architecture.md](docs/project/architecture.md) |
 | API reference | [docs/api-reference.md](docs/api-reference.md) |
-| GitLab repo | <https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree> |
+| GitHub repo | <https://github.com/XRFutureForests/pylometree> |
 
 ## Agent Entry
 

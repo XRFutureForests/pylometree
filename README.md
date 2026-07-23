@@ -37,7 +37,7 @@ pip install "pylometree[dev]"
 From source:
 
 ```bash
-git clone https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree
+git clone https://github.com/XRFutureForests/pylometree
 pip install -e ".[dev]"
 ```
 
@@ -345,13 +345,13 @@ The `parametric_models` provider evaluates JSON growth model files (Chapman-Rich
 
 ## License
 
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 This project is licensed under the
-[Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
-You may use, share, and adapt it for **non-commercial** purposes with attribution;
-commercial use is not permitted. See [LICENSE](LICENSE). Note: CC BY-NC is not an
-OSI-approved license — this is intentional, to keep the project non-commercial.
+[GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)](https://www.gnu.org/licenses/agpl-3.0).
+You are free to use, study, modify, and redistribute this software. If you run a
+modified version on a server that users interact with over a network, you must
+make the modified source available to those users. See [LICENSE](LICENSE).
 
 ## Citation
 
@@ -363,4 +363,4 @@ If you use pylometree in a publication, please cite it. See
 
 > Sperlich, M. (2026). pylometree: A Python Toolkit for Tree Allometry.
 > University of Freiburg.
-> https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree
+> https://github.com/XRFutureForests/pylometree

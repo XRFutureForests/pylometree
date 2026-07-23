@@ -5,7 +5,7 @@ XR Future Forests Lab at the University of Freiburg.
 
 ## Ways to contribute
 
-- **Report bugs** via the [GitLab issue tracker](https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree/-/issues).
+- **Report bugs** via the [GitHub issue tracker](https://github.com/XRFutureForests/pylometree/issues).
 - **Add a published equation** — register it in
   `src/pylometree/registry/published.py` with full citation metadata.
 - **Add a yield-table provider** — subclass `YieldTableProvider` in
@@ -19,9 +19,9 @@ XR Future Forests Lab at the University of Freiburg.
 
 1. Editable install with dev extras: `pip install -e ".[dev]"`.
 2. Run tests: `pytest`.
-3. Make focused changes — one logical change per merge request.
+3. Make focused changes — one logical change per pull request.
 4. Update `CHANGELOG.md` under `[Unreleased]` for user-visible changes.
-5. Open a merge request with a clear description.
+5. Open a pull request with a clear description.
 
 ## Repository structure
 

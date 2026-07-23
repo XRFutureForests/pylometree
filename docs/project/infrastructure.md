@@ -84,7 +84,7 @@ pip install -e ".[all]"
 No artifact repository or package registry is configured. pylometree is consumed directly from Git:
 
 ```shell
-pip install git+https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree.git
+pip install git+https://github.com/XRFutureForests/pylometree.git
 ```
 
 Publishing to PyPI is not planned for the current Alpha phase. Distribution approach is tracked in the [Linear XRFF backlog](https://linear.app/geosense-ufr/team/XRFF).
@@ -97,7 +97,7 @@ No automated CI/CD pipeline is currently configured. Tests are run locally by co
 |----------|-------|
 | **Platform** | None configured |
 | **Test runner** | `pytest` (local, `testpaths = ["tests"]`) |
-| **Issue tracker** | [GitLab Issues](https://gitlab.uni-freiburg.de/xr-future-forests-lab/pylometree/-/issues) |
+| **Issue tracker** | [GitHub Issues](https://github.com/XRFutureForests/pylometree/issues) |
 | **Task tracker** | [Linear — XRFF team](https://linear.app/geosense-ufr/team/XRFF) |
 
 ## 7. Contacts
