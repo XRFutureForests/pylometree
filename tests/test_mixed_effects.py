@@ -4,7 +4,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pylometree.fitting.mixed_effects import (
+# mixed_effects imports statsmodels/patsy at module scope, which live in the
+# optional `stats` extra. Without this guard a base install turned a missing
+# optional dependency into a collection error that aborted the entire suite
+# (pytest exit 2, zero tests run) instead of skipping this one module.
+pytest.importorskip("patsy", reason="requires pylometree[stats]")
+pytest.importorskip("statsmodels", reason="requires pylometree[stats]")
+
+from pylometree.fitting.mixed_effects import (  # noqa: E402
     MixedEffectsModel,
     MixedFitResult,
     RandomInterceptModel,

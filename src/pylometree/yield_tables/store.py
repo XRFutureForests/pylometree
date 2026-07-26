@@ -4,11 +4,18 @@ import csv
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import numpy as np
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    # Resolves the `add(record: "YieldTableRecord")` annotation for static
+    # analysis (ruff F821, basedpyright). record.py does not import this module,
+    # so the previous function-local import was not breaking a cycle -- it just
+    # left the annotation pointing at a name no checker could see.
+    from pylometree.yield_tables.record import YieldTableRecord
 
 REFERENCE_AGE = 50
 """Standard reference age (years) for computing the normalized site index h50."""
@@ -60,8 +67,6 @@ class StoreManifest:
     ]
 
     def add(self, record: "YieldTableRecord", filename: str) -> None:
-        from pylometree.yield_tables.record import YieldTableRecord  # noqa: F811
-
         h50 = compute_h50(record.ages, record.heights)
         self.entries.append(
             {
