@@ -24,3 +24,9 @@ venv/
 htmlcov/
 
 tests/manual/results/
+
+# AI agent tooling (dev branch only - kept off main for a clean public tree)
+.claude/
+AGENTS.md
+CLAUDE.md
+.github/copilot-instructions.md
