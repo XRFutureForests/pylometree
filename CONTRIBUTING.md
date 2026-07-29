@@ -72,6 +72,22 @@ registry.register(ModelEntry(
 Add the call to `src/pylometree/registry/published.py` and a corresponding
 test in `tests/test_published_registry.py`.
 
+## Maintainer note: `dev` -> `main` merges
+
+`main` intentionally does not track `AGENTS.md`, `CLAUDE.md`, or
+`.github/copilot-instructions.md` (dev-workflow tooling only); `dev` does.
+Prefer cherry-picking specific commits from `dev` onto `main`. For a bulk
+local merge instead, `.gitattributes` marks those paths `merge=ours` so
+`git merge dev` keeps them absent on `main` instead of conflicting - but
+that only works after running, once per clone:
+
+```
+git config merge.ours.driver true
+```
+
+This has no effect on GitHub/GitLab's server-side "Merge" button; always
+merge or cherry-pick locally, then push.
+
 ## Questions
 
 Open an issue or contact the maintainer.
