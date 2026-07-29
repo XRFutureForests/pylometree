@@ -13,8 +13,7 @@ build/
 venv/
 
 # IDE
-.vscode/launch.json
-.vscode/tasks.json
+.vscode/
 .idea/
 
 # Testing / tooling
