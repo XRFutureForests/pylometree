@@ -357,8 +357,7 @@ make the modified source available to those users. See [LICENSE](LICENSE).
 
 ## Citation
 
-<!-- After the first Zenodo release, replace XXXXXXX and uncomment the badge. -->
-<!-- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21509863.svg)](https://doi.org/10.5281/zenodo.21509863)
 
 If you use pylometree in a publication, please cite it. See
 [CITATION.cff](CITATION.cff) for machine-readable metadata, or:
