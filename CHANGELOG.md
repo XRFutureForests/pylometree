@@ -65,8 +65,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `CITATION.cff` claimed version 0.1.2 while `pyproject.toml` was on 0.1.1 and
-  the changelog's latest entry was 0.1.1. All three now agree.
+- The `dev` branch had not received the 0.1.2 release made on `main`, leaving
+  its `pyproject.toml` on 0.1.1 while `CITATION.cff` read 0.1.2. Reconciled in
+  this merge; all three sources now agree.
+
+## [0.1.2] - 2026-07-29
+
+### Removed
+
+- `.github/copilot-instructions.md`, `AGENTS.md`, and `CLAUDE.md` from
+  `main` — dev-workflow tooling, not project documentation; they now live
+  on a `dev` branch instead.
+- A tracked personal `.vscode/settings.json` that hardcoded the
+  maintainer's local Windows username and conda path; untracked and
+  widened `.gitignore` to the whole `.vscode/` directory.
+
 
 ## [0.1.1] - 2026-07-27
 

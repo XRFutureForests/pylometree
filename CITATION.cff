@@ -6,7 +6,11 @@ version: 0.3.0
 date-released: "2026-08-31"
 license: AGPL-3.0-or-later
 repository-code: "https://github.com/XRFutureForests/pylometree"
-doi: 10.5281/zenodo.21509863
+doi: 10.5281/zenodo.21509863  # concept DOI - always resolves to the latest version
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22210761
+    description: Versioned DOI for release v0.3.0
 abstract: >-
     A general-purpose Python toolkit for tree allometry — fitting, evaluating,
     and looking up allometric equations for height-diameter relationships,
