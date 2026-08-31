@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software or its outputs in a publication, please cite it as below."
 title: "pylometree — A Python Toolkit for Tree Allometry"
 type: software
-version: 0.2.0
+version: 0.3.0
 date-released: "2026-08-31"
 license: AGPL-3.0-or-later
 repository-code: "https://github.com/XRFutureForests/pylometree"
