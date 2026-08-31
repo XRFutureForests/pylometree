@@ -4,6 +4,36 @@ All notable user-facing changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-08-31
+
+### Added
+
+- Five generalized European aboveground biomass equations from Forrester et al.
+  (2017), *Forest Ecology and Management* 396:160–175
+  (doi:10.1016/j.foreco.2017.04.011), transcribed from Table A.5 of the authors'
+  published database (doi:10.17632/4jytx9s44j.1):
+  *Abies alba*, *Fagus sylvatica*, *Larix decidua*, *Picea abies*,
+  *Quercus robur*.
+
+  Diameter-only form (the paper's equation 3):
+
+  ```
+  ln(B) = ln(b0) + beta · ln(d)   =>   B = exp(ln_b0) · CF · d^beta
+  ```
+
+  The Baskerville correction factor `CF` is folded into `a` so each entry is a
+  plain power law usable through `m1_dbh`; `parameters` keeps `ln_b0`, `beta`
+  and `cf` alongside it so every value can be checked against the source.
+
+  These are preferable to the Zianis entries for the species they share. They
+  are fitted over far wider diameter ranges (*Picea* 1–82 cm against Zianis'
+  11–47 cm) on much larger samples (*Picea* n=576 against n=17), and they cover
+  *Abies alba*, *Larix decidua* and *Quercus robur*, for which Zianis has no
+  aboveground equation at all.
+
+  *Quercus petraea* and *Pseudotsuga menziesii* have no diameter-only
+  aboveground row in Table A.5; Douglas fir remains available via Zianis eq. 526.
+
 ## [0.2.0] - 2026-08-31
 
 ### Added

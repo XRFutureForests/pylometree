@@ -11,6 +11,8 @@ To add your own equations:
 
 from __future__ import annotations
 
+import math
+
 from pylometree.models.biomass import chave2014, m1_dbh, m3_d2h, m4_dbh_height
 from pylometree.models.crown import jucker2017_agb
 from pylometree.models.hd import (
@@ -271,5 +273,75 @@ for _no, _sp, _a, _b, _c, _note in _ZIANIS_AGB:
             units={"agb": "kg", "dsob": "cm"} if _c is None
             else {"agb": "kg", "dsob": "cm", "hst": "m"},
             notes=f"Appendix A eq. {_no}. Total aboveground biomass (AB). {_note}",
+        )
+    )
+
+# ---------------------------------------------------------------------------
+# Aboveground biomass – Forrester et al. 2017, generalized European equations
+# ---------------------------------------------------------------------------
+#
+# Transcribed from Table A.5 of the authors' published database
+# (doi:10.17632/4jytx9s44j.1), the appendix to Forrester DI et al. (2017),
+# For. Ecol. Manage. 396:160-175, doi:10.1016/j.foreco.2017.04.011.
+#
+# Only the diameter-only form (the paper's equation 3) is taken:
+#
+#     ln(B) = ln(b0) + beta * ln(d)      =>      B = exp(ln(b0)) * d^beta * CF
+#
+# CF is the Baskerville correction factor for back-transforming a log-log fit;
+# it is folded into `a` so the entry is a plain power law usable through
+# `m1_dbh`. `parameters` keeps ln_b0, beta and cf alongside the folded `a` so
+# every value can be checked against the source table.
+#
+# These supersede the Zianis entries for the species they share. They are fitted
+# over far wider diameter ranges (Picea 1-82 cm against Zianis' 11-47 cm) on much
+# larger samples (Picea n=576 against n=17), which removes most of the
+# extrapolation problem, and they cover Abies alba, Larix decidua and
+# Quercus robur, for which Zianis has no aboveground equation at all.
+#
+# Units confirmed from the source table's own "d range (cm)" column and by
+# cross-check against German NFI stem volume x wood density.
+
+_FORRESTER_REF = (
+    "Forrester DI, Tachauer IHH, Annighoefer P, Barbeito I, Pretzsch H, "
+    "Ruiz-Peinado R, Stark H, Vacchiano G, Zlatanov T, Chakraborty T, Saha S, "
+    "Sileshi GW (2017) Generalized biomass and leaf area allometric equations "
+    "for European tree species incorporating stand structure, tree age and "
+    "climate. Forest Ecology and Management 396:160-175. "
+    "doi:10.1016/j.foreco.2017.04.011. Coefficients from Table A.5 of the "
+    "accompanying database, doi:10.17632/4jytx9s44j.1"
+)
+
+# (species, ln_b0, beta, cf, n, r2, d_min, d_max)
+_FORRESTER_AGB = [
+    ("Abies alba",      -2.3958, 2.4497, 1.00068043755297, 132, 0.9795,  5.7, 57.7),
+    ("Fagus sylvatica", -1.6594, 2.3589, 0.996923865219428, 330, 0.9812, 1.0, 84.0),
+    ("Larix decidua",   -1.6512, 2.2312, 1.02915947159889, 165, 0.9800,  4.0, 90.1),
+    ("Picea abies",     -1.8865, 2.3034, 1.05914076643193, 576, 0.9854,  1.0, 82.0),
+    ("Quercus robur",   -2.6840, 2.7274, 1.0227726239165,   66, 0.9191,  5.9, 67.5),
+]
+
+for _sp, _lnb0, _beta, _cf, _n, _r2, _dmin, _dmax in _FORRESTER_AGB:
+    _a = math.exp(_lnb0) * _cf
+    _slug = _sp.lower().replace(" ", "_")
+    registry.register(
+        ModelEntry(
+            model_id=f"forrester2017_{_slug}_agb",
+            model_type="agb",
+            equation_form="AGB = exp(ln_b0) · CF · D^beta",
+            response="agb",
+            covariates=["dsob"],
+            parameters={"a": _a, "b": _beta, "ln_b0": _lnb0, "cf": _cf},
+            fn=_m1(_a, _beta),
+            species=[_sp],
+            region=["europe"],
+            reference=_FORRESTER_REF,
+            pub_year=2017,
+            units={"agb": "kg", "dsob": "cm"},
+            notes=(
+                f"Table A.5, diameter-only form (eq. 3). n={_n}, R2={_r2}, "
+                f"fitted D {_dmin}-{_dmax} cm. Generalized across Europe rather "
+                f"than a single country. CF={_cf:.6f} folded into a."
+            ),
         )
     )
