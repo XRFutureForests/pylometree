@@ -4,6 +4,40 @@ All notable user-facing changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-08-31
+
+### Added
+
+- Nine total-aboveground-biomass equations for European species from Zianis et
+  al. (2005), *Biomass and stem volume equations for tree species in Europe*,
+  Silva Fennica Monographs 4 (doi:10.14214/sf.sfm4). Until now every biomass
+  entry in the registry was pantropical (Chave 2014, Jucker 2017) or a banana
+  model, so there was nothing usable for a Central European forest.
+
+  | Species | Appendix A equations |
+  |---|---|
+  | *Fagus sylvatica* | 88, 90, 91, 92 |
+  | *Picea abies* | 141, 151 |
+  | *Pinus sylvestris* | 328, 334 |
+  | *Pseudotsuga menziesii* | 526 |
+
+  Only equations for component **AB** (total aboveground biomass) in form M1
+  (`a·D^b`) or M4 (`a·D^b·H^c`), with biomass in kg, D in cm and H in m, were
+  taken. Each `model_id` embeds its Appendix A equation number so an entry can
+  be checked against the source, and `notes` carries sample size, r², the
+  fitted DBH range and the country — the DBH range being what decides whether
+  an equation may be applied to a given stand.
+
+  *Quercus robur*, *Quercus petraea*, *Abies alba* and *Larix decidua* have no
+  qualifying equation in the monograph and are deliberately absent rather than
+  approximated by a congener. The two *Pinus sylvestris* entries were fitted on
+  2–16 cm saplings and are noted as unsuitable for mature stands.
+
+### Fixed
+
+- `CITATION.cff` claimed version 0.1.2 while `pyproject.toml` was on 0.1.1 and
+  the changelog's latest entry was 0.1.1. All three now agree.
+
 ## [0.1.1] - 2026-07-27
 
 ### Added
