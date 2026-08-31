@@ -358,6 +358,7 @@ make the modified source available to those users. See [LICENSE](LICENSE).
 ## Citation
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21509863.svg)](https://doi.org/10.5281/zenodo.21509863)
+[![DOI (v0.3.0)](https://img.shields.io/badge/DOI%20v0.3.0-10.5281%2Fzenodo.22210761-blue)](https://doi.org/10.5281/zenodo.22210761)
 
 If you use pylometree in a publication, please cite it. See
 [CITATION.cff](CITATION.cff) for machine-readable metadata, or:
