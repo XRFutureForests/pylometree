@@ -41,7 +41,8 @@ class ModelEntry:
         Unique identifier (e.g. ``"chave2014_pantropical"``).
     model_type : str
         Category: ``"hd"`` | ``"agb"`` | ``"bgb"`` | ``"volume"`` |
-        ``"crown_agb"`` | ``"crown_dbh"`` | ``"age_height"``.
+        ``"crown_agb"`` | ``"crown_dbh"`` | ``"age_height"`` |
+        ``"leaf_area"``.
     equation_form : str
         Human-readable equation string (e.g. ``"agb = a*(rho*dbh**2*h)**b"``).
     response : str

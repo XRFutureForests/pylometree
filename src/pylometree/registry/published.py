@@ -345,3 +345,89 @@ for _sp, _lnb0, _beta, _cf, _n, _r2, _dmin, _dmax in _FORRESTER_AGB:
             ),
         )
     )
+
+
+# Forrester et al. (2017) leaf area, from the same Table A.5 and the same
+# diameter-only form (eq. 3) as the AGB entries above. The paper's title says
+# "biomass AND LEAF AREA"; only the biomass half had been registered.
+#
+# ONE-SIDED (projected) area, which is what makes these comparable to a leaf
+# area measured off mesh geometry. The workbook never states the convention in
+# words, but its own Table A.1 settles it: conifer specific leaf area runs
+# Pinus sylvestris 4.16, Picea abies 5.26, Pseudotsuga menziesii 5.74 m2/kg
+# (medians). All-sided values for those species are 2.5-3x higher, so these are
+# projected. Getting this wrong would scale every conifer target by ~3x.
+#
+# Abies alba has NO leaf-area equation in the source -- only biomass -- so the
+# pooled `forrester2017_conifers_la` stands in for it. That pooled equation at
+# d=18 cm gives 38.6 m2, the silver-fir target growpy's crown-density
+# calibration has been quoting.
+#
+# Quercus petraea and Q. robur share one fit in the source; it is registered
+# once, listing both. Douglas fir is spelled "Pseudotuga menziesii" in the
+# workbook -- a typo there, corrected here.
+
+_SPECIES_FIT = "Species-specific fit."
+_POOLED_FIT = "Pooled fit, for a species with no leaf-area equation of its own."
+
+# (species, ln_b0, beta, cf, n, r2, d_min, d_max, scope note)
+_FORRESTER_LA = [
+    (["Betula pendula"], -1.2126, 1.5839, 1.124239, 66, 0.8618, 1.0, 14.0, _SPECIES_FIT),
+    (["Fagus sylvatica"], -1.419, 1.8909, 1.097594, 330, 0.8707, 0.8, 73.0, _SPECIES_FIT),
+    (["Fraxinus excelsior"], -1.9073, 2.3915, 0.792654, 158, 0.8162, 0.1, 69.3, _SPECIES_FIT),
+    (["Larix decidua"], -1.3776, 1.7507, 0.957285, 132, 0.907, 4.0, 90.0, _SPECIES_FIT),
+    (["Picea abies"], -1.3434, 1.857, 1.011095, 1007, 0.9025, 1.0, 76.4, _SPECIES_FIT),
+    (["Pinus sylvestris"], -2.065, 1.746, 1.009605, 848, 0.8573, 1.0, 61.7, _SPECIES_FIT),
+    (["Prunus avium"], -2.4215, 1.42, 1.001107, 66, 0.9462, 1.0, 10.0, _SPECIES_FIT),
+    (["Pseudotsuga menziesii"], -1.6095, 1.9025, 0.970451, 1385, 0.8579, 1.0, 163.0, _SPECIES_FIT),
+    (
+        ["Quercus robur", "Quercus petraea"],
+        -1.7839, 2.1375, 0.966327, 99, 0.9108, 5.9, 67.5,
+        _SPECIES_FIT,
+    ),
+    ([], -1.8155, 1.8971, 0.984659, 3844, 0.8212, 1.0, 163.0, _POOLED_FIT),
+    ([], -1.5623, 1.8628, 1.066264, 1758, 0.8018, 0.1, 88.2, _POOLED_FIT),
+    ([], -1.7192, 1.8832, 1.010284, 5602, 0.8207, 0.1, 163.0, _POOLED_FIT),
+]
+
+# Model-id slugs, in the order of _FORRESTER_LA: the species-specific fits take
+# their species' name, the three pooled fits their grouping.
+_FORRESTER_LA_SLUGS = [
+    "betula_pendula",
+    "fagus_sylvatica",
+    "fraxinus_excelsior",
+    "larix_decidua",
+    "picea_abies",
+    "pinus_sylvestris",
+    "prunus_avium",
+    "pseudotsuga_menziesii",
+    "quercus_robur",
+    "conifers",
+    "broadleaved",
+    "all_species",
+]
+
+for _slug, _row in zip(_FORRESTER_LA_SLUGS, _FORRESTER_LA, strict=True):
+    _sps, _lnb0, _beta, _cf, _n, _r2, _dmin, _dmax, _scope = _row
+    _a = math.exp(_lnb0) * _cf
+    registry.register(
+        ModelEntry(
+            model_id=f"forrester2017_{_slug}_la",
+            model_type="leaf_area",
+            equation_form="LA = exp(ln_b0) * CF * D^beta",
+            response="leaf_area",
+            covariates=["dsob"],
+            parameters={"a": _a, "b": _beta, "ln_b0": _lnb0, "cf": _cf},
+            fn=_m1(_a, _beta),
+            species=list(_sps),
+            region=["europe"],
+            reference=_FORRESTER_REF,
+            pub_year=2017,
+            units={"leaf_area": "m2", "dsob": "cm"},
+            notes=(
+                f"Table A.5, diameter-only form (eq. 3). {_scope} "
+                f"n={_n}, R2={_r2}, fitted D {_dmin}-{_dmax} cm. ONE-SIDED "
+                f"(projected) leaf area. CF={_cf:.6f} folded into a."
+            ),
+        )
+    )
