@@ -417,7 +417,19 @@ for _slug, _row in zip(_FORRESTER_LA_SLUGS, _FORRESTER_LA, strict=True):
             equation_form="LA = exp(ln_b0) * CF * D^beta",
             response="leaf_area",
             covariates=["dsob"],
-            parameters={"a": _a, "b": _beta, "ln_b0": _lnb0, "cf": _cf},
+            # d_min/d_max are the source's own fitted diameter range, carried
+            # as parameters rather than prose so a caller can test for
+            # extrapolation. It matters here: Prunus avium was fitted over
+            # d 1-10 cm and Betula pendula over 1-14 cm, so a mature tree is
+            # well outside both, and a power law does not degrade gently.
+            parameters={
+                "a": _a,
+                "b": _beta,
+                "ln_b0": _lnb0,
+                "cf": _cf,
+                "d_min": _dmin,
+                "d_max": _dmax,
+            },
             fn=_m1(_a, _beta),
             species=list(_sps),
             region=["europe"],
