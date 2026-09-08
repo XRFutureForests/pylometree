@@ -438,8 +438,7 @@ No formal ADR directory exists yet. Key decisions recorded in source:
 2. C4 Model for Visualizing Software Architecture — https://c4model.com/
 3. ISO/IEC/IEEE 42010:2022 — Architecture description
 4. pylometree Requirements Document — [requirements.md](requirements.md)
-5. pylometree original architecture overview — [../architecture.md](../architecture.md)
-6. allometric R package variable conventions — https://allometric.github.io/allometric/
+5. allometric R package variable conventions — https://allometric.github.io/allometric/
 
 ---
 

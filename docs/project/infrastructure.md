@@ -14,7 +14,7 @@
 ## Quick Navigation
 
 - [Docs Hub](../README.md)
-- [Architecture](../architecture.md)
+- [Architecture](architecture.md)
 - [API Reference](../api-reference.md)
 - [Contributing](../../CONTRIBUTING.md)
 
@@ -26,7 +26,7 @@
 | Read When | You need install constraints, optional provider requirements, data directory layout, or CI/CD facts. |
 | Skip When | You only need API signatures, model equations, or architecture design rationale. |
 | Canonical | Yes |
-| Next Docs | [Architecture](../architecture.md), [API Reference](../api-reference.md) |
+| Next Docs | [Architecture](architecture.md), [API Reference](../api-reference.md) |
 | Primary Sources | `pyproject.toml`, `src/pylometree/yield_tables/`, `data/` |
 
 ## 1. Deployment Model

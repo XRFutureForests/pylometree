@@ -13,7 +13,7 @@
 |------|------|
 | Documentation rules | [documentation_standards.md](documentation_standards.md) |
 | Documentation map | [README.md](README.md) |
-| Architecture decisions | [architecture.md](architecture.md) |
+| Architecture decisions | [project/architecture.md](project/architecture.md) |
 
 ## Agent Entry
 
