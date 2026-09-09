@@ -10,6 +10,7 @@ Ingested tables are stored as CSV files that slot into the store resolution path
 
 import importlib.resources
 import logging
+import re
 import shutil
 import subprocess
 import tempfile
@@ -24,6 +25,77 @@ from pylometree.yield_tables.record import YieldTableRecord
 from pylometree.yield_tables.species import SpeciesMapping, load_species_mapping
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Shared PDF table helpers
+# ---------------------------------------------------------------------------
+#
+# Every yield table in these documents has a MULTI-ROW header -- "Age" over
+# "(years)", "Mean" over "diam." over "(cm)". tabula keeps only the first row as
+# the DataFrame's columns and leaves the rest as leading data rows, so matching
+# a column by its bare name (`"age" in df.columns`) finds nothing and every
+# parser silently yielded zero tables. These helpers rebuild the full label.
+
+_NUMBER_RE = re.compile(r"-?\d+(?:[.,]\d+)?")
+_NUMERIC_CELL_RE = re.compile(r"^-?\d+(?:[.,]\d+)?$")
+
+
+def _cell_number(value: Any) -> Optional[float]:
+    """Parse a cell as a single number, accepting a decimal comma."""
+    text = str(value).strip().replace(",", ".")
+    return float(text) if _NUMERIC_CELL_RE.match(text) else None
+
+
+def _cell_numbers(value: Any) -> List[float]:
+    """Every number in a cell, for columns tabula merged (e.g. "20 12.5")."""
+    return [float(m.replace(",", ".")) for m in _NUMBER_RE.findall(str(value))]
+
+
+def _normalize_label(value: Any) -> str:
+    """Collapse a header fragment to lowercase single-spaced text.
+
+    tabula joins wrapped header lines with a carriage return, so a cell can
+    arrive as "Alter\\rJahre" or "DG\\rcm".
+    """
+    text = str(value).replace("\r", " ").replace("\n", " ")
+    return re.sub(r"\s+", " ", text).strip().lower()
+
+
+def _compose_header(
+    df: "pd.DataFrame", max_header_rows: int = 3
+) -> tuple["pd.DataFrame", List[str]]:
+    """Fold leading header rows into the column labels.
+
+    Returns the data-only frame and one composed label per column. A row counts
+    as data (and stops the fold) once a third of its cells parse as numbers.
+    """
+    labels = [_normalize_label(c) for c in df.columns]
+    first_data_row = 0
+    for i in range(min(max_header_rows, len(df))):
+        row = df.iloc[i].tolist()
+        numeric = sum(1 for v in row if _cell_number(v) is not None)
+        if numeric >= max(2, len(row) // 3):
+            break
+        labels = [
+            f"{label} {_normalize_label(cell)}".strip()
+            for label, cell in zip(labels, row)
+        ]
+        first_data_row = i + 1
+
+    cleaned = [
+        re.sub(r"\s+", " ", re.sub(r"\b(?:nan|unnamed: \d+)\b", " ", label)).strip()
+        for label in labels
+    ]
+    return df.iloc[first_data_row:].reset_index(drop=True), cleaned
+
+
+def _find_label(labels: List[str], *needles: str) -> Optional[int]:
+    """Index of the first label containing every needle, or None."""
+    for i, label in enumerate(labels):
+        if all(n in label for n in needles):
+            return i
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -509,7 +581,17 @@ def _parse_pryor_pdf(
     pdf_path: Path,
     species_map: SpeciesMapping,
 ) -> Iterable[YieldTableRecord]:
-    """Parse wild cherry yield tables from Pryor FC Bulletin 75."""
+    """Parse wild cherry yield tables from Pryor FC Bulletin 75.
+
+    FC Bulletin 75 (1988) is typeset without ruling lines, so ``lattice=True``
+    finds no tables at all -- that alone is why this provider used to ingest
+    nothing. In stream mode the yield table comes back with a two-row header and
+    with age and top height merged into a single "Age Top / height" column, so
+    the age cell reads "20 12.5" and has to be split.
+
+    The table runs consecutive blocks, one per yield class, distinguished only
+    by age restarting; each block is emitted as its own record.
+    """
     try:
         import tabula
     except ImportError:
@@ -520,7 +602,7 @@ def _parse_pryor_pdf(
 
     try:
         tables = tabula.read_pdf(
-            str(pdf_path), pages="all", multiple_tables=True, lattice=True,
+            str(pdf_path), pages="all", multiple_tables=True, stream=True,
         )
     except Exception as e:
         logger.error("Failed to extract tables from PDF: %s", e)
@@ -534,60 +616,65 @@ def _parse_pryor_pdf(
         if table_df is None or table_df.empty:
             continue
 
-        table_df.columns = [str(c).strip().lower() for c in table_df.columns]
-
-        age_col = None
-        for candidate in ["age", "age (years)", "years"]:
-            if candidate in table_df.columns:
-                age_col = candidate
-                break
-        if age_col is None:
+        data, labels = _compose_header(table_df)
+        age_col = _find_label(labels, "age")
+        dbh_col = _find_label(labels, "diam")
+        if age_col is None or dbh_col is None or data.empty:
             continue
 
-        height_col = None
-        for candidate in ["top height", "height", "ht", "top height (m)"]:
-            if candidate in table_df.columns:
-                height_col = candidate
-                break
+        # "age top height (years) (m)" means tabula merged the two columns.
+        age_holds_height = "height" in labels[age_col]
+        height_col = None if age_holds_height else _find_label(labels, "height")
 
-        dbh_col = None
-        for candidate in ["dbh", "mean dbh", "dbh (cm)"]:
-            if candidate in table_df.columns:
-                dbh_col = candidate
-                break
+        blocks: List[Dict[str, List[float]]] = []
+        current: Optional[Dict[str, List[float]]] = None
+        for _, row in data.iterrows():
+            age_values = _cell_numbers(row.iloc[age_col])
+            dbh = _cell_number(row.iloc[dbh_col])
+            if not age_values or dbh is None:
+                continue
 
-        if height_col is None and dbh_col is None:
-            continue
+            age = age_values[0]
+            if age_holds_height:
+                if len(age_values) < 2:
+                    continue
+                height = age_values[1]
+            elif height_col is not None:
+                height = _cell_number(row.iloc[height_col])
+                if height is None:
+                    continue
+            else:
+                height = 0.0
 
-        table_df = table_df.copy()
-        table_df[age_col] = pd.to_numeric(table_df[age_col], errors="coerce")
-        table_df = table_df.dropna(subset=[age_col])
-        if table_df.empty:
-            continue
-        if height_col:
-            table_df[height_col] = pd.to_numeric(table_df[height_col], errors="coerce")
-        if dbh_col:
-            table_df[dbh_col] = pd.to_numeric(table_df[dbh_col], errors="coerce")
+            # A yield class ends where age stops increasing.
+            if current is None or age <= current["ages"][-1]:
+                current = {"ages": [], "heights": [], "dbhs": []}
+                blocks.append(current)
+            current["ages"].append(age)
+            current["heights"].append(height)
+            current["dbhs"].append(dbh)
 
-        table_df = table_df.sort_values(age_col).reset_index(drop=True)
-        table_idx += 1
-
-        record = YieldTableRecord(
-            species_latin=latin,
-            species_common=mapped.get("common_name", ""),
-            standardized_name=mapped.get("standardized_name", ""),
-            region="UK",
-            management="normal",
-            site_index=0.0,
-            source="pryor_cherry",
-            table_id=f"FC_B75_t{table_idx}",
-            ages=table_df[age_col].tolist(),
-            heights=table_df[height_col].fillna(0).tolist() if height_col else [0.0] * len(table_df),
-            dbhs=table_df[dbh_col].fillna(0).tolist() if dbh_col else [0.0] * len(table_df),
-        )
-
-        issues = record.validate()
-        if not issues:
+        for block in blocks:
+            if len(block["ages"]) < 3:
+                continue
+            table_idx += 1
+            record = YieldTableRecord(
+                species_latin=latin,
+                species_common=mapped.get("common_name", ""),
+                standardized_name=mapped.get("standardized_name", ""),
+                region="UK",
+                management="normal",
+                site_index=float(table_idx),
+                source="pryor_cherry",
+                table_id=f"FC_B75_t{table_idx}",
+                ages=block["ages"],
+                heights=block["heights"],
+                dbhs=block["dbhs"],
+            )
+            issues = record.validate()
+            if issues:
+                logger.debug("Skipping Pryor block %d: %s", table_idx, issues)
+                continue
             yield record
 
 
