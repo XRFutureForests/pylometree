@@ -29,3 +29,11 @@ tests/manual/results/
 AGENTS.md
 CLAUDE.md
 .github/copilot-instructions.md
+
+# --- Data layout (workspace standard) ---------------------------------------
+#   data/input/   inputs; small committed files only
+#   data/output/  regenerable products - never committed
+#   data/tmp/     run scratch - never committed
+# No repo-root tmp/, temp/ or outputs/ - scratch lives in data/tmp/.
+/data/output/
+/data/tmp/
