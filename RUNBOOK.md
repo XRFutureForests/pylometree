@@ -178,6 +178,8 @@ python -m pylometree.yield_tables.cli --clean --store-dir ./yield_store
 | `pryor_cherry` | Wild cherry (FC Bulletin 75) | 1 | tabula-py + Java |
 | `nova_scotia` | Nova Scotia Report 22 | 8 | tabula-py + Java |
 | `usda_stocking` | USDA stocking/yield tables | varies | tabula-py + Java |
+| `forit` | ForIT — Italian NFI volume and phytomass equations (Tabacchi et al. 2011) | 50+ | R + ForIT |
+| `forstpraxis_et` | Forstpraxis Ertragstafelauszüge — German extracts incl. hornbeam and small-leaved linden | ~20 | tabula-py + Java |
 | `parametric_models` | JSON growth model files | any | none |
 
 A provider whose dependency is missing is **silently disabled**, not an error — so always

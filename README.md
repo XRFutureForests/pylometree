@@ -20,7 +20,7 @@ flowchart LR
     FIT --> MET["metrics<br/>R² · RMSE · MSA · SSPB"]
     REG --> DER["derived values<br/>AGB · carbon · volume · age · crown"]
     FIT --> DER
-    YT["yield_tables<br/>8 providers, one store"] --> DER
+    YT["yield_tables<br/>10 providers, one store"] --> DER
     DER --> STAND["Stand aggregates<br/>Mg/ha, m²/ha"]
 ```
 
@@ -90,9 +90,13 @@ Registering your own equation, loading a plot from CSV, and the yield-table work
 
 ## Included models
 
-**H–D forms** (`pylometree.models.hd`): `chapman_richards`, `exponential_3p`, `gompertz`,
-`hyperbolic`, `michaelis_menten`, `power_law`, `log_linear`, `logistic_3p`, `weibull_4p`,
-`korf`, `von_bertalanffy` — equations in [docs/api-reference.md](docs/api-reference.md).
+**H–D forms** — the 12 entries in `HD_MODELS`, which is what `select_model` searches:
+`power_law`, `log_linear`, `hyperbolic`, `michaelis_menten`, `logarithmic`,
+`chapman_richards`, `exponential_3p`, `gompertz`, `von_bertalanffy`, `logistic_3p`,
+`weibull_4p`, `korf`. Equations in [docs/api-reference.md](docs/api-reference.md).
+
+`pylometree.models.hd` also defines `log_time_growth`, which is deliberately **not** in
+`HD_MODELS` — pass it to `fit_model(fn=…)` explicitly if you want it.
 
 **Published registry entries:**
 

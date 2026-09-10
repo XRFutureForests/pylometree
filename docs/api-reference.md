@@ -19,7 +19,7 @@ Height–diameter equation forms. Every function has the signature
 | `chapman_richards(D, a, b, c)` | a, b, c | `a * (1 - exp(-b*D))**c` |
 | `exponential_3p(D, a, b, c)` | a, b, c | `a - b*exp(-c*D)` |
 | `gompertz(D, a, b, c)` | a, b, c | `a * exp(-exp(b - c*D))` |
-| `hyperbolic(D, a, b)` | a, b | `a + b/D` |
+| `hyperbolic(D, a, b)` | a, b | `D / (a + b*D)` |
 | `michaelis_menten(D, a, b)` | a, b | `a*D / (b + D)` |
 | `power_law(D, a, b)` | a, b | `a * D**b` |
 | `log_linear(D, a, b)` | a, b | `a + b*log(D)` |
