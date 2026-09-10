@@ -2,32 +2,19 @@
 
 General-purpose Python toolkit for tree allometry — fitting, evaluating, and looking up allometric equations for H-D relationships, above- and below-ground biomass, crown structure, stem volume, and height-age growth.
 
-<!-- SCOPE: Canonical machine-facing entry point with repo map, critical rules, command overview, and links to detailed documentation ONLY. -->
-<!-- DOC_KIND: index -->
-<!-- DOC_ROLE: canonical -->
-<!-- READ_WHEN: Start here when you need the project map, local rules, or the next canonical document. -->
-<!-- SKIP_WHEN: Skip when you already know the exact target document or code area. -->
-<!-- PRIMARY_SOURCES: AGENTS.md, docs/README.md -->
 
-## Quick Navigation
+## Documentation Map
 
 | Need | Read |
 |------|------|
-| Documentation map | [docs/README.md](docs/README.md) |
-| Standards | [docs/documentation_standards.md](docs/documentation_standards.md) |
-| Principles | [docs/principles.md](docs/principles.md) |
-| Architecture | [docs/project/architecture.md](docs/project/architecture.md) |
-| API reference | [docs/api-reference.md](docs/api-reference.md) |
+| What the library is, features, design notes | [README.md](README.md) |
+| Install, fitting, registry, yield tables, troubleshooting | [RUNBOOK.md](RUNBOOK.md) |
+| API surface, species coverage, tutorials | [docs/](docs/README.md) |
+| Why these metrics, equation-choice rationale, place in the twin | XR Future Forests Lab knowledge hub (`04-LOGIC-TIER/pylometree`) — **not** in this repo |
 | GitHub repo | <https://github.com/XRFutureForests/pylometree> |
 
-## Agent Entry
-
-- Purpose: Canonical repo map and routing layer for agents.
-- Read when: You need the project overview, local rules, or the next canonical doc.
-- Skip when: You already know the exact file or document to inspect.
-- Canonical: Yes.
-- Read next: `docs/README.md`, then the relevant canonical doc for the task.
-- Primary sources: `AGENTS.md`, `docs/README.md`.
+Deep-dive documentation is deliberately not duplicated here. If you need to explain *why* an
+approach was chosen, write it in the knowledge hub and link to it.
 
 ## Critical Rules
 
@@ -92,4 +79,4 @@ General-purpose Python toolkit for tree allometry — fitting, evaluating, and l
 - [ ] Commands match current `pyproject.toml`
 - [ ] Canonical docs listed here still exist
 
-**Last Updated:** 2026-05-11
+**Last Updated:** 2026-09-10
