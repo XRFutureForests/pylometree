@@ -18,7 +18,8 @@ XR Future Forests Lab at the University of Freiburg.
 ## Development workflow
 
 1. Editable install with dev extras: `pip install -e ".[dev]"`.
-2. Run tests: `pytest`.
+2. Run tests: `pytest` — locally; there is no CI (all pipelines are off workspace-wide
+   since 2026-09-01) and no pre-commit hook.
 3. Make focused changes — one logical change per pull request.
 4. Update `CHANGELOG.md` under `[Unreleased]` for user-visible changes.
 5. Open a pull request with a clear description.
@@ -33,7 +34,8 @@ XR Future Forests Lab at the University of Freiburg.
 - `src/pylometree/io/` — CSV/DataFrame adapters
 - `src/pylometree/yield_tables/` — multi-source yield-table ingestion
 - `tests/` — test suite
-- `docs/` — architecture, API reference, tutorials, species reference
+- `docs/` — API reference, species reference, tutorials (index in `docs/README.md`); the
+  *why* lives in the XR Future Forests Lab knowledge hub
 
 ## Code style
 
@@ -70,7 +72,8 @@ registry.register(ModelEntry(
 ```
 
 Add the call to `src/pylometree/registry/published.py` and a corresponding
-test in `tests/test_published_registry.py`.
+test in `tests/test_registry.py` (the Zianis and Forrester entries currently have none —
+a known gap).
 
 ## Maintainer note: `dev` -> `main` merges
 

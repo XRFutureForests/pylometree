@@ -10,10 +10,34 @@ Published equations available via `pylometree.registry`. Predict with `registry.
 
 ### Biomass (AGB)
 
+Registry state 2026-09-15 (36 entries in total). Where a species has both a Forrester and a
+Zianis entry, prefer Forrester: wider fitted diameter range, larger samples — see
+`CHANGELOG.md` 0.3.0.
+
 | Model ID | Species | Region | Covariates | Equation | Reference |
 |---|---|---|---|---|---|
 | `chave2014_pantropical` | Pantropical (generic) | pantropical | `dsob`, `hst`, `rho` | AGB = 0.0673·(ρ·D²·H)^0.976 | Chave et al. (2014) GCB |
 | `laskar2020_musa_agb` | *Musa balbisiana* | tropical_asia | `dsob`, `hst` | AGB = exp(−4.54 + 0.874·ln(D²H)) × 1.06 | Laskar et al. (2020) |
+| `forrester2017_abies_alba_agb` | *Abies alba* | europe | `dsob` | B = exp(ln_b0)·CF·d^β (power law, CF folded into `a`) | Forrester et al. (2017) FEM 396 |
+| `forrester2017_fagus_sylvatica_agb` | *Fagus sylvatica* | europe | `dsob` | as above | Forrester et al. (2017) |
+| `forrester2017_larix_decidua_agb` | *Larix decidua* | europe | `dsob` | as above | Forrester et al. (2017) |
+| `forrester2017_picea_abies_agb` | *Picea abies* | europe | `dsob` | as above | Forrester et al. (2017) |
+| `forrester2017_quercus_robur_agb` | *Quercus robur* | europe | `dsob` | as above | Forrester et al. (2017) |
+| `zianis2005_eq88/90/91/92_fagus_sylvatica_agb` | *Fagus sylvatica* | temperate_europe | `dsob` (+`hst` on some) | per-equation, see `parameters` | Zianis et al. (2005) Silva Fennica Monographs 4 |
+| `zianis2005_eq141/151_picea_abies_agb` | *Picea abies* | temperate_europe | `dsob` | per-equation | Zianis et al. (2005) |
+| `zianis2005_eq328/334_pinus_sylvestris_agb` | *Pinus sylvestris* | temperate_europe | `dsob` | per-equation | Zianis et al. (2005) |
+| `zianis2005_eq526_pseudotsuga_menziesii_agb` | *Pseudotsuga menziesii* | temperate_europe | `dsob` | per-equation | Zianis et al. (2005) |
+
+### Leaf area
+
+Forrester et al. (2017) leaf-area equations, same power-law form, each carrying the fitted
+diameter range in `parameters`. Species entries: *Betula pendula*, *Fagus sylvatica*,
+*Fraxinus excelsior*, *Larix decidua*, *Picea abies*, *Pinus sylvestris*, *Prunus avium*,
+*Pseudotsuga menziesii*, *Quercus robur* (also serves *Q. petraea*) — model IDs
+`forrester2017_<species>_la`. Pooled fallbacks: `forrester2017_conifers_la`,
+`forrester2017_broadleaved_la`, `forrester2017_all_species_la` (*Abies alba* has no own
+entry; the conifer pool stands in for it).
+
 
 ### Crown → AGB
 

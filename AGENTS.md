@@ -31,6 +31,8 @@ approach was chosen, write it in the knowledge hub and link to it.
 | Yield tables | Offline-first resolution — no silent remote fallback | yield_tables/ |
 | Task tracking | Use Linear MCP for all issue operations — check before creating new issues | Always |
 | Language | Keep project code and documentation in English | All written artifacts |
+| Release docs | `CHANGELOG.md` and `CONTRIBUTING.md` stay: public PyPI-style package released to Zenodo from `main` (workspace decision 2026-09-15 — only growpy, pylometree, digital-twin-db and dtm-to-unreal carry them); `dev` is the working branch | Always |
+| Tutorials | `docs/tutorials/` stays in the repo: they are package how-tos for external users, not project explanations | docs/ changes |
 
 ## MCP Tool Preferences
 
@@ -50,7 +52,7 @@ approach was chosen, write it in the knowledge hub and link to it.
 | Install with uv | `uv pip install -e ".[dev]"` |
 | Run tests | `pytest` |
 | Run tests verbose | `pytest -v --tb=short` |
-| Yield table CLI | `pylometree-ingest --help` |
+| Yield table CLI | `pylometree-ingest --help` (console script restored 2026-09-15, XRFF-353 — re-install editable) |
 | Format | `ruff format .` |
 | Lint | `ruff check .` |
 
@@ -79,4 +81,4 @@ approach was chosen, write it in the knowledge hub and link to it.
 - [ ] Commands match current `pyproject.toml`
 - [ ] Canonical docs listed here still exist
 
-**Last Updated:** 2026-09-10
+**Last Updated:** 2026-09-15

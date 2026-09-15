@@ -9,7 +9,7 @@ description = "General-purpose tree allometry toolkit for Python"
 readme = "README.md"
 license = "AGPL-3.0-or-later"
 authors = [
-    { name = "XR Future Forests Lab", email = "maximilian.sperlich@gmail.com" },
+    { name = "XR Future Forests Lab", email = "maximilian.sperlich@unr.uni-freiburg.de" },
 ]
 requires-python = ">=3.12"
 keywords = [
@@ -40,6 +40,9 @@ all = [
     "pytest>=7.4",
     "pytest-cov>=4.1",
 ]
+
+[project.scripts]
+pylometree-ingest = "pylometree.yield_tables.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

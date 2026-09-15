@@ -4,6 +4,29 @@ All notable user-facing changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- `[project.scripts]` entry for `pylometree-ingest` (XRFF-353). The 0.1.0 entry below
+  records adding it, but no release ever shipped the section, so `pip install` never
+  created the command even though `yield_tables/cli.py` and eleven doc references
+  existed. Re-install editable to get it.
+
+### Added
+
+- Forrester et al. 2017 leaf-area equations registered beside the biomass ones, carrying
+  the fitted diameter range (`992ae41`, `d67e8bf`).
+- Pryor cherry yield tables read, with the surrogate flag set where a table stands in
+  for a species it was not fitted on (`8b4d733`).
+
+### Changed
+
+- Documentation consolidated to `README.md` + `RUNBOOK.md` at the root (`f7123ee`);
+  HD model list, hyperbolic equation and provider count corrected (`ca96597`).
+- Workspace data layout adopted (`21b8536`); GitHub Actions CI removed (`a3f937e`) — all
+  CI is off workspace-wide since 2026-09-01.
+
 ## [0.3.0] - 2026-08-31
 
 ### Added

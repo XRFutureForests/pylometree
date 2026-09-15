@@ -1,149 +1,40 @@
-# Test Documentation
+# Tests — pylometree
 
-**Last Updated:** 2026-05-12
+**Last Updated:** 2026-09-15
 
-<!-- SCOPE: Test organization structure and Story-Level Test Task Pattern ONLY. Contains test directories organization, test execution commands, quick navigation. -->
-<!-- DOC_KIND: index -->
-<!-- DOC_ROLE: canonical -->
-<!-- READ_WHEN: Read when you need the current test layout, execution commands, or links to test policy. -->
-<!-- SKIP_WHEN: Skip when you only need the universal testing philosophy. -->
-<!-- PRIMARY_SOURCES: tests/, pyproject.toml, docs/reference/guides/testing-strategy.md -->
-<!-- DO NOT add here: Test code -> test files, Story implementation -> docs/tasks/kanban_board.md, Test strategy -> docs/reference/guides/testing-strategy.md -->
-
-## Quick Navigation
-
-- [Testing Strategy](../docs/reference/guides/testing-strategy.md)
-- [Task Rules](../docs/tasks/README.md)
-- [Kanban Board](../docs/tasks/kanban_board.md)
-- [Guides](../docs/reference/guides/)
-
-## Agent Entry
-
-| Signal | Value |
-|--------|-------|
-| Purpose | Maps the test directories, execution commands, and links to the broader testing policy. |
-| Read When | You need to find tests, run them, or understand the local test layout. |
-| Skip When | You only need general testing philosophy. |
-| Canonical | Yes |
-| Next Docs | [Testing Strategy](../docs/reference/guides/testing-strategy.md), [Task Rules](../docs/tasks/README.md) |
-| Primary Sources | `tests/`, `pyproject.toml`, `docs/reference/guides/testing-strategy.md` |
-
----
-
-## Overview
-
-This directory contains all tests for pylometree, following the **Story-Level Test Task Pattern** where automated tests live under `tests/` and are consolidated in the final Story test task rather than scattered across implementation tasks.
-
-**Test framework:** pytest >= 7.4 (configured in `pyproject.toml`)
-**Test runner:** `pytest -v` (addopts = "-v" per pyproject.toml)
-**Naming convention:** `test_*.py`
-
----
-
-## Testing Philosophy
-
-**Test your code, not frameworks.** Focus on allometry equation correctness, biomass calculation accuracy, and H-D model fitting logic. Avoid testing numpy/scipy internals or pandas DataFrame mechanics.
-
-**Risk-based testing:** Automate only Priority `>=15` scenarios (`Business Impact x Probability`). Each test should satisfy the usefulness criteria in [testing-strategy.md](../docs/reference/guides/testing-strategy.md).
-
----
-
-## Test Organization
+pytest suite, discovered via `pyproject.toml` (`testpaths = ["tests"]`). No CI (all
+pipelines are off workspace-wide since 2026-09-01) and no pre-commit hook — run it yourself
+before committing.
 
 ```
 tests/
-├── __init__.py
-├── README.md                    # This file
-├── test_biomass.py              # Biomass calculation models
-├── test_crown_models.py         # Crown allometry models
-├── test_data.py                 # Data loading and validation
-├── test_fitting.py              # H-D curve fitting routines
-├── test_hd_models.py            # Height-diameter models
-├── test_io.py                   # I/O helpers
-├── test_metrics.py              # Goodness-of-fit metrics
-├── test_registry.py             # Species/model registry
-├── test_volume_models.py        # Volume calculation models
-└── manual/                      # Manual test scripts
-    └── results/                 # Test outputs (in .gitignore)
+|-- test_biomass.py          # AGB equations, bias correction
+|-- test_crown_models.py     # crown → AGB
+|-- test_data.py             # Tree / Stand dataclasses, per-hectare aggregation
+|-- test_fitting.py          # curve_fit wrapper, bootstrap CIs, AIC selection
+|-- test_hd_models.py        # the 12 height–diameter forms
+|-- test_io.py               # CSV / DataFrame adapters
+|-- test_metrics.py          # R², RMSE, MAE, bias, AIC, AICc, MSA, SSPB
+|-- test_mixed_effects.py    # mixed-effects fitting
+|-- test_registry.py         # ModelRegistry queries, strict model_type matching
+|-- test_taxonomy.py         # Taxon resolution
+|-- test_units.py            # pint-based unit conversion
+|-- test_volume_models.py    # stem volume
+`-- manual/                  # scratch for manual runs (gitignored results)
 ```
 
-**Key test scenarios (Priority >=15):**
-- Allometry equation implementations (correctness against published coefficients)
-- H-D curve fitting accuracy (parameter recovery on synthetic data)
-- Biomass calculations (unit correctness, species-specific model accuracy)
-- Carbon conversion pipeline (end-to-end from field measurements)
+## Running
 
----
-
-## Story-Level Test Task Pattern
-
-**Rule:** All E2E, integration, and unit tests for a Story are written in the **final Story test task** created after manual testing.
-
-**Workflow:**
-1. Implementation tasks complete.
-2. Manual testing runs and bugs are fixed.
-3. Test planner creates the final Story test task.
-4. Test executor adds the automated tests.
-5. Story is done only after tests pass.
-
----
-
-## Running Tests
-
-**Run all tests:**
-
-```bash
-pytest -v
-```
-
-or
-
-```bash
-python -m pytest
-```
-
-**Run a specific test file:**
-
-```bash
-pytest tests/test_biomass.py -v
+```shell
+pip install -e ".[dev]"
+pytest                       # everything
 pytest tests/test_hd_models.py -v
-pytest tests/test_fitting.py -v
+pytest -k "forrester or zianis" -v
+pytest --cov=src --cov-report=term-missing
 ```
 
-**Run tests matching a keyword:**
+## What to test
 
-```bash
-pytest -v -k "biomass"
-pytest -v -k "hd_model or fitting"
-```
-
-**Run with coverage:**
-
-```bash
-pytest --cov=src -v
-pytest --cov=src --cov-report=html -v
-```
-
-**Run with extra verbosity (show print output):**
-
-```bash
-pytest -v -s
-```
-
----
-
-## Maintenance
-
-**Update Triggers:**
-- When adding new test files or test suites
-- When changing test execution commands
-- When modifying Story-Level Test Task Pattern workflow
-- When new key test scenarios are identified
-
-**Verification:**
-- [ ] All test files listed in Test Organization are accurate
-- [ ] `tests/manual/results/` is in `.gitignore`
-- [ ] Test execution commands match `pyproject.toml` configuration
-- [ ] Links to testing strategy and task workflow resolve
-
-**Last Updated:** 2026-05-12
+Business logic — equation forms, back-transformation bias correction, registry matching,
+unit handling — not numpy, scipy or pandas internals. A new published equation gets a test
+in `test_registry.py` that checks one known value against the source paper.
