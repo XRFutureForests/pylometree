@@ -21,13 +21,33 @@ logger = logging.getLogger(__name__)
 # Species proxy table: when no yield table is found for the primary species,
 # fall back to a related species with similar growth characteristics.
 # Key = standardized name, value = proxy standardized name.
+#
+# These are not ad-hoc guesses. Several German species were never given yield
+# tables of their own -- the classical tables (Wiedemann, Schober, Gehrhardt,
+# Wimmenauer et al.) cover the commercially dominant species only -- so forest
+# administrations assign each remaining species an established table to use in
+# its place. Where an official assignment exists it is followed here, and the
+# entry says so; the authority is the Bavarian State Forest species-to-yield-
+# table map shipped as `ytables_bavrn_state_var_1` in the ForestElementsR R
+# package.
+#
+# A resolution through this table sets YieldTableData.proxy_for, so a caller
+# can tell a substituted curve from the species' own and disclose it.
 SPECIES_PROXIES: Dict[str, str] = {
     "field_maple": "sycamore_maple",  # Acer campestre -> A. pseudoplatanus
     "grand_fir": "silver_fir",  # Abies grandis -> A. alba (same genus)
-    "hornbeam": "european_beech",  # Carpinus betulus -> Fagus sylvatica (shade-tolerant broadleaf)
-    "small_leaved_linden": "european_beech",  # Tilia cordata -> Fagus sylvatica (shade-tolerant broadleaf)
-    "sycamore_maple": "common_ash",  # Acer pseudoplatanus -> Fraxinus excelsior (fast broadleaf)
-    "wild_cherry": "silver_birch",  # Prunus avium -> Betula pendula (pioneer broadleaf)
+    # Carpinus betulus -> Fagus sylvatica. Bavarian state assignment (id 63).
+    "hornbeam": "european_beech",
+    # Tilia cordata -> Fagus sylvatica (Wiedemann 1931). Matches the Bavarian
+    # state assignment for Winterlinde (id 62) exactly.
+    "small_leaved_linden": "european_beech",
+    # Acer pseudoplatanus -> Fraxinus excelsior (Wimmenauer 1919/29). Matches
+    # the Bavarian state assignment for Bergahorn (id 64) exactly.
+    "sycamore_maple": "common_ash",
+    # Prunus avium -> Fraxinus excelsior. The Bavarian state assigns Vogelkirsche
+    # (id 68) the ash table, NOT birch as this entry used to say. Only reached
+    # when the measured Pryor (FC Bulletin 75) cherry tables are not ingested.
+    "wild_cherry": "common_ash",
 }
 
 
@@ -94,6 +114,7 @@ def resolve_yield_table(
                 "  Using proxy yield table for %s (%s): %s",
                 species_common, chain, result.title,
             )
+            result.proxy_for = species_std
             return result
         current = proxy_std
 

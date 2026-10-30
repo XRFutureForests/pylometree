@@ -20,3 +20,8 @@ class YieldTableData:
     management: str = ""
     site_index: Optional[float] = None
     h50: Optional[float] = None
+    # Set when this table was resolved through SPECIES_PROXIES rather than for
+    # the species actually asked for -- holds that requested standardized name.
+    # Without it a proxied table is indistinguishable from a real one
+    # downstream, and a caller can silently publish another species' curve.
+    proxy_for: str = ""
