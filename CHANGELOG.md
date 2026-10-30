@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-30
+
 ### Fixed
 
 - `[project.scripts]` entry for `pylometree-ingest` (XRFF-353). The 0.1.0 entry below
