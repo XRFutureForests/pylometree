@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `jucker2017_agb` / `jucker2017_crown_agb` now compute Jucker et al. (2017) Eq. 7,
+  `(0.016 + αG)·(H·CD)^(2.013 + βG)·exp(0.204²/2)`. The previous form
+  (`0.016·H^0.940·CA^0.932`) is not in the paper and returned about 70x too little
+  biomass. New `gymnosperm=True` selects the conifer terms; the entry is no longer
+  tagged `pantropical`.
+
 ## [0.4.0] - 2026-10-30
 
 ### Fixed
