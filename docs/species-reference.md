@@ -43,7 +43,7 @@ entry; the conifer pool stands in for it).
 
 | Model ID | Species | Region | Covariates | Equation | Reference |
 |---|---|---|---|---|---|
-| `jucker2017_crown_agb` | Pantropical (generic) | pantropical | `hst`, `crown_area` | AGB = 0.016·H^0.940·CA^0.932 | Jucker et al. (2017) GCB |
+| `jucker2017_crown_agb` | Global (generic, angiosperm) | — | `hst`, `crown_area` | AGB = 0.016·(H·CD)^2.013·exp(0.204²/2), CD = 2√(CA/π) | Jucker et al. (2017) GCB, Eq. 7 |
 
 ### Height–Diameter (H–D)
 
@@ -216,7 +216,7 @@ Species with coverage from **multiple** data sources. "Eq." = allometric equatio
 | White pine | *Pinus strobus* | — | — | — | — | — | — | — | ✓ |
 | *Musa balbisiana* | *Musa balbisiana* | Laskar | Laskar | — | — | — | — | — | — |
 
-> **Pantropical equations** (Chave 2014 AGB, Jucker 2017 crown→AGB) apply to all tropical species given `dsob`, `hst`, `rho` (or `crown_area`). They are not species-specific and are omitted from per-species rows.
+> **Generic equations** (Chave 2014 AGB, pantropical; Jucker 2017 crown→AGB, global) apply given `dsob`, `hst`, `rho` (or `crown_area`). They are not species-specific and are omitted from per-species rows.
 
 ---
 

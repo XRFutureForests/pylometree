@@ -65,13 +65,13 @@ registry.register(
     ModelEntry(
         model_id="jucker2017_crown_agb",
         model_type="crown_agb",
-        equation_form="AGB = 0.016 · H^0.940 · CA^0.932",
+        equation_form="AGB = a · (H · CD)^b · exp(0.204²/2), CD = 2·sqrt(CA/π)",
         response="agb",
         covariates=["hst", "crown_area"],
-        parameters={"a": 0.016, "b": 0.940, "c": 0.932},
+        parameters={"a": 0.016, "b": 2.013},
         fn=lambda hst, crown_area, **_: jucker2017_agb(hst, crown_area),
         species=[],
-        region=["pantropical"],
+        region=[],
         reference=(
             "Jucker T, Caspersen J, Chave J, et al. (2017) Allometric "
             "equations for integrating remote sensing imagery into forest "
@@ -80,7 +80,10 @@ registry.register(
         ),
         pub_year=2017,
         units={"agb": "kg", "hst": "m", "crown_area": "m2"},
-        notes="Pantropical crown-based; requires only H and crown area.",
+        notes=(
+            "Global crown-based (Eq. 7), angiosperm coefficients; requires only H "
+            "and crown area. Gymnosperms: jucker2017_agb(..., gymnosperm=True)."
+        ),
     )
 )
 

@@ -49,7 +49,7 @@ Height–diameter equation forms. Every function has the signature
 
 | Function | Purpose |
 |---|---|
-| `jucker2017(ca, h, rho)` | Crown area + height → AGB (Jucker 2017) |
+| `jucker2017_agb(hst, crown_area, gymnosperm=False)` | Height + crown area → AGB in kg (Jucker 2017, Eq. 7) |
 | `htoo2025(...)` | Htoo et al. 2025 crown-based AGB |
 
 ---

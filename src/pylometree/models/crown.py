@@ -52,20 +52,27 @@ def agb_from_crown(
 
     Notes
     -----
-    Jucker et al. (2017) provide pantropical coefficients for this form.
+    Jucker et al. (2017) use H · CD jointly instead; see ``jucker2017_agb``.
     After log-transformation: ln(AGB) = ln(a) + b·ln(H) + c·ln(CA).
     """
     return a * _arr(hst) ** b * _arr(crown_area) ** c
 
 
-def jucker2017_agb(hst: ArrayLike, crown_area: ArrayLike) -> np.ndarray:
-    """Jucker et al. (2017) pantropical crown-based AGB equation (kg).
+def jucker2017_agb(
+    hst: ArrayLike, crown_area: ArrayLike, gymnosperm: bool = False
+) -> np.ndarray:
+    """Jucker et al. (2017) crown-based AGB equation (their Eq. 7), in kg.
 
-    AGB = 0.016 · H^0.940 · CA^0.932
+    AGB = (0.016 + αG) · (H · CD)^(2.013 + βG) · exp(0.204² / 2)
+
+    with αG = 0.093, βG = -0.223 for gymnosperms and 0 for angiosperms; the
+    exp term is the published log-bias correction (Baskerville 1972).
+    CD (crown diameter, m) is taken from ``crown_area`` (m²) as a circle:
+    CD = 2·sqrt(CA/π).
 
     Returns AGB in **kg dry mass**.
 
-    Valid range (from paper): H 2–70 m, CA 1–1500 m².
+    Data range (from paper): H 1.3–72.5 m, CD 0.1–41.0 m.
 
     Reference
     ---------
@@ -73,7 +80,9 @@ def jucker2017_agb(hst: ArrayLike, crown_area: ArrayLike) -> np.ndarray:
     integrating remote sensing imagery into forest monitoring programmes.
     Global Change Biology 23(1):177-190. doi:10.1111/gcb.13388
     """
-    return 0.016 * _arr(hst) ** 0.940 * _arr(crown_area) ** 0.932
+    a, b = (0.016 + 0.093, 2.013 - 0.223) if gymnosperm else (0.016, 2.013)
+    cd = 2.0 * np.sqrt(_arr(crown_area) / np.pi)
+    return a * (_arr(hst) * cd) ** b * np.exp(0.204**2 / 2)
 
 
 # ---------------------------------------------------------------------------

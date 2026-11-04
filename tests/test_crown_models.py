@@ -24,10 +24,12 @@ class TestAgbFromCrown:
         np.testing.assert_allclose(out, [400.0, 1600.0])
 
     def test_jucker2017_reference_value(self):
-        # For H=20, CA=50: AGB = 0.016 * 20^0.940 * 50^0.932
-        agb = crown.jucker2017_agb(hst=20.0, crown_area=50.0)
-        expected = 0.016 * 20.0**0.940 * 50.0**0.932
-        assert agb == pytest.approx(expected)
+        # Jucker et al. 2017 Eq. 7, worked by hand: H=20 m, CA=50 m2 -> CD=7.979 m,
+        # H*CD=159.58; 0.016 * 159.58^2.013 * exp(0.204^2/2) = 444 kg
+        assert crown.jucker2017_agb(hst=20.0, crown_area=50.0) == pytest.approx(444, rel=0.01)
+        # gymnosperm: 0.109 * 159.58^1.790 * exp(0.204^2/2) = 977 kg
+        gym = crown.jucker2017_agb(hst=20.0, crown_area=50.0, gymnosperm=True)
+        assert gym == pytest.approx(977, rel=0.01)
 
     def test_jucker2017_monotonic_in_height(self):
         out = crown.jucker2017_agb(hst=[5.0, 15.0, 30.0], crown_area=20.0)
