@@ -20,7 +20,7 @@ approach was chosen, write it in the knowledge hub and link to it.
 
 | Category | Rule | When to Apply |
 |----------|------|---------------|
-| Confirmation | Never commit or push without explicit user confirmation | Always |
+| Confirmation | Commit and push your own work with an explicit pathspec; anything outward-facing waits for the owner (Decision rights, workspace `AGENTS.md`) | Always |
 | Scope | Modify only what the request requires — no adjacent cleanup | Always |
 | Simplicity | Minimum code that solves the problem — no speculative features | Always |
 | Pure models | Functions in `src/pylometree/models/` must have no I/O and no side effects | Before adding to models/ |
