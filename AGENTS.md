@@ -2,7 +2,6 @@
 
 General-purpose Python toolkit for tree allometry — fitting, evaluating, and looking up allometric equations for H-D relationships, above- and below-ground biomass, crown structure, stem volume, and height-age growth.
 
-
 ## Documentation Map
 
 | Need | Read |
@@ -18,31 +17,19 @@ approach was chosen, write it in the knowledge hub and link to it.
 
 ## Critical Rules
 
+Workspace rules (decision rights, commits, Linear, tool preferences) are in the workspace `AGENTS.md` one level above the repos and apply here too. The basics: change only what the task needs, verify each step, commit your own work with an explicit pathspec, never commit secrets.
+
 | Category | Rule | When to Apply |
 |----------|------|---------------|
-| Confirmation | Commit and push your own work with an explicit pathspec; anything outward-facing waits for the owner (Decision rights, workspace `AGENTS.md`) | Always |
-| Scope | Modify only what the request requires — no adjacent cleanup | Always |
-| Simplicity | Minimum code that solves the problem — no speculative features | Always |
 | Pure models | Functions in `src/pylometree/models/` must have no I/O and no side effects | Before adding to models/ |
 | Naming | Use allometric R convention: `dsob` (DBH outside bark, cm), `hst` (stem height, m) | All public API |
 | Units | Document units in every docstring — no implicit conversion | All model functions |
 | Bias correction | Back-transformation bias correction (Sprugel 1983) must be explicit, never silent | Log-space transforms |
 | Registry | Strict `model_type` matching — no implicit cross-type lookups | Registry queries |
 | Yield tables | Offline-first resolution — no silent remote fallback | yield_tables/ |
-| Task tracking | Use Linear MCP for all issue operations — check before creating new issues | Always |
 | Language | Keep project code and documentation in English | All written artifacts |
 | Release docs | `CHANGELOG.md` and `CONTRIBUTING.md` stay: public PyPI-style package released to Zenodo from `main` (workspace decision 2026-09-15 — only growpy, pylometree, digital-twin-db and dtm-to-unreal carry them); `dev` is the working branch | Always |
 | Tutorials | `docs/tutorials/` stays in the repo: they are package how-tos for external users, not project explanations | docs/ changes |
-
-## MCP Tool Preferences
-
-| Need | Preferred flow |
-|------|----------------|
-| Discover files | `mcp__hex-line__inspect_path` with narrow path |
-| Search text | `mcp__hex-line__grep_search` summary mode, narrow before content |
-| Read code | `mcp__hex-line__outline` or targeted `mcp__hex-line__read_file` |
-| Edit code | `read_file(edit_ready=true)` → `edit_file(base_revision)` → verify |
-| Semantic risk | `mcp__hex-graph__index_project` → symbol/architecture analysis |
 
 ## Development Commands
 
@@ -81,4 +68,4 @@ approach was chosen, write it in the knowledge hub and link to it.
 - [ ] Commands match current `pyproject.toml`
 - [ ] Canonical docs listed here still exist
 
-**Last Updated:** 2026-09-15
+**Last Updated:** 2026-11-17
