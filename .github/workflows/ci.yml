@@ -23,23 +23,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      # Build from environment.yml (the documented dev setup, ruff included) so CI cannot
+      # drift from it; the package itself goes in editable on top.
+      - uses: mamba-org/setup-micromamba@v2
         with:
-          python-version: '3.12'
-          cache: pip
+          environment-file: environment.yml
+          cache-environment: true
 
       - name: Install
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[all]"
-          pip install ruff
+        shell: micromamba-shell {0}
+        run: pip install -e ".[all]"
 
       - name: Lint (bug-level rules — blocking)
+        shell: micromamba-shell {0}
         run: ruff check --select F82,F63,F7,E9 src/pylometree
 
       - name: Lint (full rule set — advisory)
+        shell: micromamba-shell {0}
         run: ruff check src/pylometree
         continue-on-error: true
 
       - name: Test
+        shell: micromamba-shell {0}
         run: pytest -q

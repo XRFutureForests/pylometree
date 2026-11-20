@@ -35,8 +35,9 @@ Workspace rules (decision rights, commits, Linear, tool preferences) are in the 
 
 | Task | Command |
 |------|---------|
+| Create the env | `conda env create -f environment.yml` |
+| Activate the env | `conda activate pylometree` |
 | Install (editable + dev) | `pip install -e ".[dev]"` |
-| Install with uv | `uv pip install -e ".[dev]"` |
 | Run tests | `pytest` |
 | Run tests verbose | `pytest -v --tb=short` |
 | Yield table CLI | `pylometree-ingest --help` (console script restored 2026-09-15, XRFF-353 — re-install editable) |

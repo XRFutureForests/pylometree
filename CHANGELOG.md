@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Development setup is a conda env: `environment.yml` (conda-forge) replaces `uv.lock`.
+  `pip install pylometree` for users is unchanged.
+
 ### Fixed
 
 - `jucker2017_agb` / `jucker2017_crown_agb` now compute Jucker et al. (2017) Eq. 7,
